@@ -1,6 +1,6 @@
-using Interface.ISort;
+using point_1.src.interfaces;
 
-namespace point_1.algorithms
+namespace point_1.src.algorithms
 {
     public class InsertionSort : ISort
     {

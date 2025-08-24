@@ -1,4 +1,4 @@
-namespace Interface.ISort
+namespace point_1.src.interfaces
 {
     public interface ISort
     {

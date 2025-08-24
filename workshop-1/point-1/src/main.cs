@@ -1,6 +1,6 @@
-using Interface.ISort;
+using point_1.src.interfaces;
 
-namespace point_1
+namespace point_1.src
 {
     public class SortContext
     {

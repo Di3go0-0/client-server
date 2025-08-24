@@ -1,4 +1,5 @@
-﻿using point_1.algorithms;
+﻿using point_1.src;
+using point_1.src.algorithms;
 
 namespace point_1
 {

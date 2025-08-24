@@ -1,31 +1,33 @@
-﻿using point_1.src;
-using point_1.src.algorithms;
+﻿using point_1.src.comparers;
+using point_1.src.enums;
+using point_1.src.infrastructure;
 
-namespace point_1
+internal class Program
 {
-
-    class Program
+    static void Main()
     {
-        static void Main()
-        {
-            var data = new List<int> { 5, 2, 9, 1, 5, 6 };
-            var context = new SortContext();
+        var factory = new SortFactory();
+        var context = new SortContext();
 
-            // El usuario selecciona QuickSort Ascendente
-            context.SetStrategy(new QuickSort());
-            context.Execute(data, ascending: true);
+        var data = new List<int> { 5, 2, 9, 1, 5, 6 };
 
-            Console.WriteLine("Ordenado asc: " + string.Join(", ", data));
+        // QuickSort Ascendente
+        context.Use(factory.Create(SortAlgorithm.Quick))
+               .Execute(data, new AscComparer());
+        Console.WriteLine("QuickSort Asc: " + string.Join(", ", data));
 
-            // El usuario selecciona Burbuja Descendente
-            data = new List<int> { 5, 2, 9, 1, 5, 6 };
-            context.SetStrategy(new BubbleSort());
-            context.Execute(data, ascending: false);
+        // BubbleSort Descendente
+        data = new List<int> { 5, 2, 9, 1, 5, 6 };
+        context.Use(factory.Create(SortAlgorithm.Bubble))
+               .Execute(data, new DescComparer());
+        Console.WriteLine("BubbleSort Desc: " + string.Join(", ", data));
 
-            Console.WriteLine("Ordenado desc: " + string.Join(", ", data));
-        }
+        // InsertionSort Ascendente
+        data = new List<int> { 3, 8, 4, 7, 2 };
+        context.Use(factory.Create(SortAlgorithm.Insertion))
+               .Execute(data, new AscComparer());
+        Console.WriteLine("InsertionSort Asc: " + string.Join(", ", data));
     }
-
 }
 
 

@@ -1,16 +1,17 @@
-using point_1.src.interfaces;
+using point_1.src.abstractions;
 
 namespace point_1.src.algorithms
 {
     public class InsertionSort : ISort
     {
-        public void Sort(List<int> data, bool ascending = true)
+        public void Sort(List<int> data, IComparer<int>? comparer = null)
         {
+            comparer ??= Comparer<int>.Default;
             for (int i = 1; i < data.Count; i++)
             {
                 int key = data[i];
                 int j = i - 1;
-                while (j >= 0 && (ascending ? data[j] > key : data[j] < key))
+                while (j >= 0 && comparer.Compare(data[j], key) > 0)
                 {
                     data[j + 1] = data[j];
                     j--;

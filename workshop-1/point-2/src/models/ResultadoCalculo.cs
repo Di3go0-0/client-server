@@ -1,9 +1,5 @@
 namespace point_2.Models;
 
-/// <summary>
-/// Representa el resultado del cálculo de cuotas para un producto
-/// Cumple con SRP: Solo se encarga de contener el resultado del cálculo
-/// </summary>
 public class CalculationResult
 {
     public decimal CashPrice { get; set; }
@@ -33,14 +29,8 @@ public class CalculationResult
         CalculationDetail = calculationDetail;
     }
 
-    /// <summary>
-    /// Calcula el porcentaje de recargo sobre el precio al contado
-    /// </summary>
     public decimal SurchargePercentage => CashPrice > 0 ? ((InstallmentPrice - CashPrice) / CashPrice) * 100 : 0;
 
-    /// <summary>
-    /// Genera un resumen legible del resultado
-    /// </summary>
     public string GenerateSummary()
     {
         return $"Precio al contado: ${CashPrice:F2}\n" +

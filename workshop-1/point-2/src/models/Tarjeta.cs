@@ -2,10 +2,6 @@ using point_2.Enums;
 
 namespace point_2.Models;
 
-/// <summary>
-/// Representa una tarjeta de crédito con su información básica
-/// Cumple con SRP: Solo se encarga de mantener información de la tarjeta
-/// </summary>
 public class Card
 {
     public CardBrand Brand { get; set; }
@@ -23,9 +19,6 @@ public class Card
         CardHolder = cardHolder;
     }
 
-    /// <summary>
-    /// Valida que la tarjeta tenga los datos mínimos necesarios
-    /// </summary>
     public bool IsValid()
     {
         return Enum.IsDefined(typeof(CardBrand), Brand) &&

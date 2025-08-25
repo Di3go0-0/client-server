@@ -1,15 +1,9 @@
 using point_2.Abstractions;
-using point_2.Models;
 using point_2.Enums;
+using point_2.Models;
 
 namespace point_2.Services;
 
-/// <summary>
-/// Servicio principal que orquesta el cálculo de cuotas
-/// Cumple con SRP: Solo se encarga de coordinar el cálculo de cuotas
-/// Cumple con DIP: Depende de abstracciones (ICalculoInteresFactory)
-/// Cumple con OCP: Abierto para extensión mediante nuevas estrategias
-/// </summary>
 public class InstallmentCalculationService
 {
     private readonly IInterestCalculationFactory _interestCalculationFactory;
@@ -19,24 +13,14 @@ public class InstallmentCalculationService
         _interestCalculationFactory = interestCalculationFactory ?? throw new ArgumentNullException(nameof(interestCalculationFactory));
     }
 
-    /// <summary>
-    /// Calcula las cuotas para un producto con una tarjeta específica
-    /// </summary>
-    /// <param name="product">Producto a calcular</param>
-    /// <param name="card">Tarjeta de crédito</param>
-    /// <param name="installmentCount">Cantidad de cuotas deseadas</param>
-    /// <returns>Resultado del cálculo</returns>
     public CalculationResult CalculateInstallments(Product product, Card card, int installmentCount)
     {
-        // Validaciones de entrada
         ValidateInputs(product, card, installmentCount);
 
         try
         {
-            // Usar el factory para obtener la estrategia correcta
             var calculationStrategy = _interestCalculationFactory.CreateStrategy(card);
 
-            // Delegar el cálculo a la estrategia específica
             return calculationStrategy.CalculateInstallments(product, card, installmentCount);
         }
         catch (NotSupportedException ex)
@@ -45,13 +29,6 @@ public class InstallmentCalculationService
         }
     }
 
-    /// <summary>
-    /// Calcula múltiples opciones de cuotas para un producto
-    /// </summary>
-    /// <param name="product">Producto a calcular</param>
-    /// <param name="card">Tarjeta de crédito</param>
-    /// <param name="installmentOptions">Array con las opciones de cuotas a calcular</param>
-    /// <returns>Lista de resultados para cada opción</returns>
     public List<CalculationResult> CalculateMultipleOptions(Product product, Card card, int[] installmentOptions)
     {
         ValidateInputs(product, card, 1); // Validación básica
@@ -83,32 +60,16 @@ public class InstallmentCalculationService
         return results;
     }
 
-    /// <summary>
-    /// Obtiene las marcas de tarjeta soportadas
-    /// </summary>
-    /// <returns>Lista de marcas soportadas</returns>
     public IEnumerable<CardBrand> GetSupportedBrands()
     {
         return _interestCalculationFactory.GetSupportedBrands();
     }
 
-    /// <summary>
-    /// Verifica si una marca de tarjeta está soportada
-    /// </summary>
-    /// <param name="brand">Marca a verificar</param>
-    /// <returns>True si está soportada</returns>
     public bool IsBrandSupported(CardBrand brand)
     {
         return _interestCalculationFactory.SupportsBrand(brand);
     }
 
-    /// <summary>
-    /// Compara diferentes marcas de tarjeta para el mismo producto y cuotas
-    /// </summary>
-    /// <param name="product">Producto a calcular</param>
-    /// <param name="issuingBank">Banco emisor</param>
-    /// <param name="installmentCount">Cantidad de cuotas</param>
-    /// <returns>Comparación de todas las marcas soportadas</returns>
     public List<CalculationResult> CompareCardBrands(Product product, IssuingBank issuingBank, int installmentCount)
     {
         ValidateProduct(product);
@@ -135,13 +96,9 @@ public class InstallmentCalculationService
             }
         }
 
-        // Ordenar por precio total (más conveniente primero)
         return results.OrderBy(r => r.InstallmentPrice).ToList();
     }
 
-    /// <summary>
-    /// Valida las entradas del cálculo
-    /// </summary>
     private void ValidateInputs(Product product, Card card, int installmentCount)
     {
         ValidateProduct(product);
@@ -158,9 +115,6 @@ public class InstallmentCalculationService
         }
     }
 
-    /// <summary>
-    /// Valida que el producto sea válido
-    /// </summary>
     private void ValidateProduct(Product product)
     {
         if (product == null)
@@ -174,9 +128,6 @@ public class InstallmentCalculationService
         }
     }
 
-    /// <summary>
-    /// Valida que la tarjeta sea válida
-    /// </summary>
     private void ValidateCard(Card card)
     {
         if (card == null)

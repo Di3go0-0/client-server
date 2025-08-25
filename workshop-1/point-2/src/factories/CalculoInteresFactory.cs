@@ -1,20 +1,12 @@
 using point_2.Abstractions;
-using point_2.Models;
 using point_2.Enums;
+using point_2.Models;
 using point_2.Strategies;
 
 namespace point_2.Factories;
 
-/// <summary>
-/// Factory Method para crear estrategias de cálculo de intereses
-/// Cumple con SRP: Solo se encarga de crear estrategias
-/// Cumple con OCP: Fácil de extender con nuevas marcas sin modificar código existente
-/// Cumple con DIP: Depende de abstracciones (ICalculoInteres) no de concreciones
-/// </summary>
 public class InterestCalculationFactory : IInterestCalculationFactory
 {
-    // Diccionario que mapea marcas con sus respectivas estrategias
-    // Esto permite extensibilidad y facilita el mantenimiento
     private readonly Dictionary<CardBrand, Func<IInterestCalculation>> _strategies;
 
     public InterestCalculationFactory()
@@ -24,7 +16,6 @@ public class InterestCalculationFactory : IInterestCalculationFactory
             { CardBrand.Visa, () => new VisaCalculationStrategy() },
             { CardBrand.MasterCard, () => new MasterCardCalculationStrategy() },
             { CardBrand.AmericanExpress, () => new AmericanExpressCalculationStrategy() }
-            // Fácil agregar nuevas marcas aquí sin modificar el resto del código
             // { CardBrand.Diners, () => new DinersCalculationStrategy() },
             // { CardBrand.Discover, () => new DiscoverCalculationStrategy() }
         };
@@ -65,10 +56,6 @@ public class InterestCalculationFactory : IInterestCalculationFactory
         return _strategies.Keys.ToList();
     }
 
-    /// <summary>
-    /// Método auxiliar para registrar nuevas estrategias dinámicamente
-    /// Útil para extensiones futuras o configuraciones dinámicas
-    /// </summary>
     public void RegisterStrategy(CardBrand brand, Func<IInterestCalculation> factoryMethod)
     {
         if (factoryMethod == null)
@@ -79,9 +66,6 @@ public class InterestCalculationFactory : IInterestCalculationFactory
         _strategies[brand] = factoryMethod;
     }
 
-    /// <summary>
-    /// Obtiene información detallada sobre las marcas soportadas
-    /// </summary>
     public Dictionary<CardBrand, string> GetBrandInformation()
     {
         return new Dictionary<CardBrand, string>

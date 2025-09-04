@@ -32,16 +32,24 @@ Esta nueva propiedad `Algorithm` es clave para el **auto-registro** en el factor
 ```csharp
 public class SortFactory
 {
-    public readonly Dictionary<SortAlgorithm, ISort> _map = new()
+    private readonly Dictionary<SortAlgorithm, ISort> _strategies;
+
+    public SortFactory(IEnumerable<ISort> strategies)
     {
-        {SortAlgorithm.Bubble, new BubbleSort()},
-        {SortAlgorithm.Insertion, new InsertionSort()},
-        {SortAlgorithm.Quick, new QuickSort()},
-    };
+        _strategies = strategies.ToDictionary(s => s.Algorithm);
+    }
+
+    public ISort Create(SortAlgorithm algorithm)
+    {
+        if (_strategies.TryGetValue(algorithm, out var strategy))
+            return strategy;
+
+        throw new ArgumentException($"Algorithm {algorithm} not registered");
+    }
 }
 ```
 
-**Centraliza la creación** de algoritmos. Mapea cada enum a su implementación concreta. Esto es util por si se desea agregar un nuevo algoritmo.
+**Revolucionamos el factory** con **auto-registro** usando DI. Ya no necesitamos hardcodear cada algoritmo - el constructor recibe todas las implementaciones de `ISort` y automáticamente las mapea usando su propiedad `Algorithm`. Esto es **súper escalable** porque cada nuevo algoritmo se registra automáticamente solo implementando la interfaz.
 
 ### 3. SortContext (Strategy Context)
 
@@ -74,23 +82,60 @@ Maneja el **estado de la estrategia actual**. Implementa una API fluida (method 
 
 Implementan **Strategy Pattern** para el criterio de ordenamiento. Se puede ordenar ascendente o descendente sin tocar los algoritmos.
 
+### 6. Inyección de Dependencias
+
+```csharp
+// Configuración en Program.cs
+var services = new ServiceCollection();
+
+// Auto-registro de algoritmos
+services.AddTransient<ISort, BubbleSort>();
+services.AddTransient<ISort, InsertionSort>();
+services.AddTransient<ISort, QuickSort>();
+
+// Registro de infraestructura
+services.AddSingleton<SortFactory>();
+services.AddSingleton<SortContext>();
+
+var provider = services.BuildServiceProvider();
+```
+
+**La magia del auto-registro**: Usando Microsoft.Extensions.DependencyInjection, todos los algoritmos que implementen `ISort` se auto-registran en el container. El `SortFactory` recibe automáticamente todas estas implementaciones y las mapea usando la propiedad `Algorithm`.
+
+**Beneficios clave**:
+- **Zero Configuration**: Solo implementar `ISort` y listo, se auto-registra
+- **Loose Coupling**: Factory no conoce implementaciones específicas
+- **Testeable**: Fácil mockar dependencias para testing
+- **Escalable**: Agregar algoritmos sin tocar factory ni configuración
+
 ## 🔄 Flujo de Ejecución
 
 ```csharp
-// 1. Inicialización
-var factory = new SortFactory();
-var context = new SortContext();
+// 1. Configuración del Container DI
+var services = new ServiceCollection();
+services.AddTransient<ISort, BubbleSort>();
+services.AddTransient<ISort, InsertionSort>();
+services.AddTransient<ISort, QuickSort>();
+services.AddSingleton<SortFactory>();
+services.AddSingleton<SortContext>();
 
-// 2. Configuración fluida
+var provider = services.BuildServiceProvider();
+
+// 2. Resolución de dependencias
+var factory = provider.GetRequiredService<SortFactory>();
+var context = provider.GetRequiredService<SortContext>();
+
+// 3. Configuración fluida
 context.Use(factory.Create(SortAlgorithm.Quick))  // Factory crea el algoritmo
        .Execute(data, new AscComparer());         // Context ejecuta con comparador
 ```
 
-El flujo es:
+El flujo actualizado es:
 
-1. **Factory** crea el algoritmo según el enum
-2. **Context** recibe la estrategia
-3. **Context** ejecuta con el comparador específico
+1. **DI Container** auto-registra todos los algoritmos
+2. **Factory** recibe las implementaciones inyectadas automáticamente
+3. **Factory** crea el algoritmo según el enum usando el mapeo interno
+4. **Context** recibe la estrategia y ejecuta con el comparador específico
 
 ## ✨ Puntos a Resaltar
 

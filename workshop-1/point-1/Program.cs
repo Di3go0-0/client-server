@@ -1,4 +1,7 @@
-﻿using point_1.src.comparers;
+﻿using Microsoft.Extensions.DependencyInjection;
+using point_1.src.abstractions;
+using point_1.src.algorithms;
+using point_1.src.comparers;
 using point_1.src.enums;
 using point_1.src.infrastructure;
 
@@ -6,8 +9,24 @@ internal class Program
 {
     static void Main()
     {
-        var factory = new SortFactory();
-        var context = new SortContext();
+        // Configuración de DI
+        var services = new ServiceCollection();
+
+        // Registrar algoritmos
+        services.AddTransient<ISort, BubbleSort>();
+        services.AddTransient<ISort, InsertionSort>();
+        services.AddTransient<ISort, QuickSort>();
+
+        // Registrar infraestructura
+        services.AddSingleton<SortFactory>();
+        services.AddSingleton<SortContext>();
+
+        var provider = services.BuildServiceProvider();
+
+        var factory = provider.GetRequiredService<SortFactory>();
+        var context = provider.GetRequiredService<SortContext>();
+
+        // --- Ejecuciones de prueba ---
 
         var data = new List<int> { 5, 2, 9, 1, 5, 6 };
 
@@ -29,5 +48,4 @@ internal class Program
         Console.WriteLine("InsertionSort Asc: " + string.Join(", ", data));
     }
 }
-
 

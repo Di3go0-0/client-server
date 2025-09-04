@@ -7,6 +7,7 @@ Patrones usados
 1. **Strategy Pattern** - Para intercambiar algoritmos dinámicamente
 2. **Factory Pattern** - Para crear instancias de algoritmos
 3. **Context Pattern** - Para manejar el estado y ejecución
+4. **Dependency Injection** - Para gestión automática de dependencias y auto-registro
 
 ## 🎯 Componentes Principales
 
@@ -15,11 +16,16 @@ Patrones usados
 ```csharp
 public interface ISort
 {
+    SortAlgorithm Algorithm { get; }
     void Sort(List<int> data, IComparer<int>? comparer = null);
 }
 ```
 
-Es el **contrato** que todos los algoritmos deben cumplir. Permite inyectar comparadores personalizados, lo que le da flexibilidad al sistema.
+Es el **contrato** que todos los algoritmos deben cumplir. Ahora incluye:
+- **Algorithm property**: Cada implementación expone qué algoritmo representa
+- **Sort method**: Permite inyectar comparadores personalizados para flexibilidad
+
+Esta nueva propiedad `Algorithm` es clave para el **auto-registro** en el factory.
 
 ### 2. SortFactory (Factory Pattern)
 

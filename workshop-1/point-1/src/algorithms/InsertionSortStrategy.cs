@@ -1,9 +1,12 @@
 using point_1.src.abstractions;
+using point_1.src.enums;
 
 namespace point_1.src.algorithms
 {
     public class InsertionSort : ISort
     {
+        public SortAlgorithm Algorithm => SortAlgorithm.Insertion;
+
         public void Sort(List<int> data, IComparer<int>? comparer = null)
         {
             comparer ??= Comparer<int>.Default;

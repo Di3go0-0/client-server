@@ -1,21 +1,23 @@
 using point_1.src.abstractions;
-using point_1.src.algorithms;
 using point_1.src.enums;
 
 namespace point_1.src.infrastructure
 {
     public class SortFactory
     {
-        public readonly Dictionary<SortAlgorithm, ISort> _map = new()
+        private readonly Dictionary<SortAlgorithm, ISort> _strategies;
+
+        public SortFactory(IEnumerable<ISort> strategies)
         {
-          {SortAlgorithm.Bubble, new BubbleSort()},
-          {SortAlgorithm.Insertion, new InsertionSort()},
-          {SortAlgorithm.Quick, new QuickSort()},
-        };
+            _strategies = strategies.ToDictionary(s => s.Algorithm);
+        }
 
         public ISort Create(SortAlgorithm algorithm)
         {
-            return _map[algorithm];
+            if (_strategies.TryGetValue(algorithm, out var strategy))
+                return strategy;
+
+            throw new ArgumentException($"Algorithm {algorithm} not registered");
         }
     }
 }

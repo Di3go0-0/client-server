@@ -1,8 +1,7 @@
-namespace point_2.src.Interfaces
+namespace point_2.src.Interfaces;
+
+public interface IProduct
 {
-    public interface IProduct
-    {
-        string Name { get; }
-        decimal BasePrice { get; }
-    }
+    string Name { get; }
+    decimal BasePrice { get; }
 }

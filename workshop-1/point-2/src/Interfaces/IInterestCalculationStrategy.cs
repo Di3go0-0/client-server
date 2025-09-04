@@ -1,9 +1,8 @@
-using point_2.src.Models;
+namespace point_2.src.Interfaces;
 
-namespace point_2.src.Interfaces
+public interface IInterestCalculationStrategy
 {
-    public interface IInterestCalculationStrategy
-    {
-        decimal CalculateInterestRate(ICreditCard card, int installments);
-    }
+    bool CanHandle(ICreditCard card);
+    decimal CalculateInterestRate(ICreditCard card, int installments);
 }
+

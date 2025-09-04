@@ -1,8 +1,7 @@
-namespace point_2.src.Interfaces
+namespace point_2.src.Interfaces;
+
+public interface ICreditCard
 {
-    public interface ICreditCard
-    {
-        string Brand { get; }
-        string IssuerBank { get; }
-    }
+    string Brand { get; }
+    string IssuerBank { get; }
 }

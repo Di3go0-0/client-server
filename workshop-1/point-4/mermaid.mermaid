@@ -1,0 +1,53 @@
+classDiagram
+class Account {
++Balance : decimal
++Deposit(amount : decimal) void
++Withdraw(amount : decimal) void
+}
+
+    class SavingsAccount {
+        +WithdrawalsThisWeek : int
+        +Deposit(amount : decimal) void
+        +Withdraw(amount : decimal) void
+    }
+
+    class IWithdrawalPolicy {
+        +IsAllowed(amount : decimal, account : SavingsAccount) bool
+    }
+
+    class MaxTwoWithdrawalsPerWeekPolicy {
+        -_maxWithdrawals : int
+        +IsAllowed(amount : decimal, account : SavingsAccount) bool
+    }
+
+    class LargeWithdrawalAuthorizationPolicy {
+        -_threshold : decimal
+        +IsAllowed(amount : decimal, account : SavingsAccount) bool
+    }
+
+    class IDepositNotificationService {
+        +NotifyLargeDeposit(amount : decimal, account : SavingsAccount) void
+    }
+
+    class AntiMoneyLaunderingNotificationService {
+        -_threshold : decimal
+        +NotifyLargeDeposit(amount : decimal, account : SavingsAccount) void
+    }
+
+    class ILoggerService {
+        +Log(message : string) void
+    }
+
+    class ConsoleLoggerService {
+        +Log(message : string) void
+    }
+
+    SavingsAccount "1" --> "0..*" IWithdrawalPolicy : has
+    SavingsAccount "1" --> "0..*" IDepositNotificationService : has
+    SavingsAccount "1" --> "1" ILoggerService : uses
+
+    IWithdrawalPolicy <|.. MaxTwoWithdrawalsPerWeekPolicy
+    IWithdrawalPolicy <|.. LargeWithdrawalAuthorizationPolicy
+    IDepositNotificationService <|.. AntiMoneyLaunderingNotificationService
+    ILoggerService <|.. ConsoleLoggerService
+    Account <|-- SavingsAccount

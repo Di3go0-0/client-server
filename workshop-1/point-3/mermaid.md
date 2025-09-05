@@ -28,13 +28,15 @@ direction LR
         +int Capacity
     }
 
-    class AlgorithmManager {
-        -Dictionary~string, IAlgorithm~ algorithms
-        +void AddAlgorithm(IAlgorithm algorithm)
-        +void RemoveAlgorithm(string algorithmName)
-        +void EditAlgorithm(string algorithmName, IAlgorithm newAlgorithm)
-        +IAlgorithm GetAlgorithm(string algorithmName)
-        +List~IAlgorithm~ GetAllAlgorithms()
+    class IAlgorithmProvider {
+        +IAlgorithm? GetAlgorithm(string name)
+        +void RegisterAlgorithm(string name, Func~IAlgorithm~ creator)
+    }
+
+    class AlgorithmProvider {
+        -Dictionary~string, Func~IAlgorithm~~ algorithms
+        +IAlgorithm? GetAlgorithm(string name)
+        +void RegisterAlgorithm(string name, Func~IAlgorithm~ creator)
     }
 
     class InventorySystem {
@@ -57,17 +59,21 @@ direction LR
     }
 
     class InventorySystemFactory {
+        -IAlgorithmProvider algorithmProvider
+        +InventorySystemFactory(IAlgorithmProvider algorithmProvider)
         +InventorySystem CreateSystem(string systemVersion, Inventory inventory)
     }
 
+    %% Relaciones
     IAlgorithm <|-- SimpleDeterministicAlgorithm
     IAlgorithm <|-- AdvancedStochasticAlgorithm
 
-    AlgorithmManager "1" o-- "*" IAlgorithm
+    IAlgorithmProvider <|.. AlgorithmProvider
+
     InventorySystem "1" *-- "1" Inventory
     InventorySystem "1" o-- "1" IAlgorithm
 
     Inventory "1" o-- "*" Product
     Inventory "1" o-- "*" Warehouse
 
-    InventorySystemFactory "1" o-- "*" AlgorithmManager
+    InventorySystemFactory "1" o-- "1" IAlgorithmProvider

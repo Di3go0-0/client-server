@@ -1,0 +1,41 @@
+classDiagram
+    direction LR
+    
+    class ISubject {
+        +Attach(IObserver observer) void
+        +Detach(IObserver observer) void
+        +Notify() void
+    }
+
+    class IObserver {
+        +Update(float temperature, float humidity) void
+    }
+
+    class WeatherStation {
+        -List~IObserver~ observers
+        -float temperature
+        -float humidity
+        +SetMeasurements(float temperature, float humidity) void
+        +Attach(IObserver observer) void
+        +Detach(IObserver observer) void
+        +Notify() void
+    }
+
+    class MobileDisplay {
+        +Update(float temperature, float humidity) void
+    }
+
+    class WebDisplay {
+        +Update(float temperature, float humidity) void
+    }
+
+    class TvDisplay {
+        +Update(float temperature, float humidity) void
+    }
+
+    ISubject <|.. WeatherStation
+    IObserver <|.. MobileDisplay
+    IObserver <|.. WebDisplay
+    IObserver <|.. TvDisplay
+
+    WeatherStation --> IObserver : notifies

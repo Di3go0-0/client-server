@@ -1,0 +1,30 @@
+classDiagram
+    direction LR
+
+    class IShape {
+        <<interface>>
+        +Draw() void
+    }
+
+    class Circle {
+        +Draw() void
+    }
+
+    class Square {
+        +Draw() void
+    }
+
+    class Triangle {
+        +Draw() void
+    }
+
+    class ShapeFactory {
+        -Dictionary~string, Func<IShape>~ _registry
+        +Register(key: string, creator: Func<IShape>) void
+        +CreateShape(key: string) IShape
+    }
+
+    IShape <|.. Circle
+    IShape <|.. Square
+    IShape <|.. Triangle
+    ShapeFactory --> IShape : "creates"

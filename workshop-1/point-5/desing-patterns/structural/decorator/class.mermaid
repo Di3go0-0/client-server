@@ -1,0 +1,50 @@
+
+classDiagram
+    direction LR
+
+    class ILoginService {
+        +Login(email: string, password: string) int?
+    }
+
+    class IGreetingService {
+        +GreetUser(userId: int) void
+    }
+
+    class LoginService {
+        -UserRepository repository
+        +Login(email: string, password: string) int?
+    }
+
+    class LoginDecorator {
+        -ILoginService inner
+        +int? LoggedUserId
+        +Login(email: string, password: string) int?
+    }
+
+    class GreetingService {
+        -UserRepository repository
+        +GreetUser(userId: int) void
+    }
+
+    class UserRepository {
+        -List~User~ users
+        +GetUserById(id: int) User
+        +GetUserByCredentials(email: string, password: string) User
+    }
+
+    class User {
+        +int Id
+        +string Name
+        +string Email
+        +string Password
+    }
+
+    %% Relaciones
+    ILoginService <|.. LoginService
+    ILoginService <|.. LoginDecorator
+    IGreetingService <|.. GreetingService
+
+    LoginService --> UserRepository
+    GreetingService --> UserRepository
+    UserRepository --> User
+    LoginDecorator --> ILoginService

@@ -1,41 +1,46 @@
+using point_3.src.Interfaces;
+
 namespace point_3.src.Core;
+
+// SRP: Maneja la colección de productos y almacenes
+// DIP: Depende de las interfaces IProduct e IWarehouse, no de las implementaciones concretas
 public class Inventory
 {
-    private readonly List<Product> _products;
-    private readonly List<Warehouse> _warehouses;
+    private readonly List<IProduct> _products;
+    private readonly List<IWarehouse> _warehouses;
 
     public Inventory()
     {
-        _products = new List<Product>();
-        _warehouses = new List<Warehouse>();
+        _products = new List<IProduct>();
+        _warehouses = new List<IWarehouse>();
     }
 
-    public void AddProduct(Product product)
+    public void AddProduct(IProduct product)
     {
         _products.Add(product);
     }
 
-    public void RemoveProduct(Product product)
+    public void RemoveProduct(IProduct product)
     {
         _products.Remove(product);
     }
 
-    public void AddWarehouse(Warehouse warehouse)
+    public void AddWarehouse(IWarehouse warehouse)
     {
         _warehouses.Add(warehouse);
     }
 
-    public void RemoveWarehouse(Warehouse warehouse)
+    public void RemoveWarehouse(IWarehouse warehouse)
     {
         _warehouses.Remove(warehouse);
     }
 
-    public List<Product> GetProducts()
+    public List<IProduct> GetProducts()
     {
         return _products.ToList(); // Retorna una copia para evitar modificación externa directa
     }
 
-    public List<Warehouse> GetWarehouses()
+    public List<IWarehouse> GetWarehouses()
     {
         return _warehouses.ToList(); // Retorna una copia
     }

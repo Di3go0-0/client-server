@@ -6,15 +6,28 @@ direction LR
         +void Execute(Inventory inventory)
     }
 
+    class IProduct {
+        <<interface>>
+        +string Name
+        +int Quantity
+        +double Price
+    }
+
+    class IWarehouse {
+        <<interface>>
+        +string Name
+        +int Capacity
+    }
+
     class Inventory {
-        -List~Product~ products
-        -List~Warehouse~ warehouses
-        +void AddProduct(Product product)
-        +void RemoveProduct(Product product)
-        +void AddWarehouse(Warehouse warehouse)
-        +void RemoveWarehouse(Warehouse warehouse)
-        +List~Product~ GetProducts()
-        +List~Warehouse~ GetWarehouses()
+        -List~IProduct~ products
+        -List~IWarehouse~ warehouses
+        +void AddProduct(IProduct product)
+        +void RemoveProduct(IProduct product)
+        +void AddWarehouse(IWarehouse warehouse)
+        +void RemoveWarehouse(IWarehouse warehouse)
+        +List~IProduct~ GetProducts()
+        +List~IWarehouse~ GetWarehouses()
     }
 
     class Product {
@@ -70,10 +83,15 @@ direction LR
 
     IAlgorithmProvider <|.. AlgorithmProvider
 
+    %% Implementación de interfaces (DIP)
+    IProduct <|.. Product
+    IWarehouse <|.. Warehouse
+
     InventorySystem "1" *-- "1" Inventory
     InventorySystem "1" o-- "1" IAlgorithm
 
-    Inventory "1" o-- "*" Product
-    Inventory "1" o-- "*" Warehouse
+    %% Inventory ahora depende de las interfaces, no de las clases concretas
+    Inventory "1" o-- "*" IProduct
+    Inventory "1" o-- "*" IWarehouse
 
     InventorySystemFactory "1" o-- "1" IAlgorithmProvider

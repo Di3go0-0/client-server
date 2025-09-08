@@ -1,6 +1,7 @@
 ﻿using point_3.src.Algorithms;
 using point_3.src.Core;
 using point_3.src.Services;
+using point_3.src.Interfaces;
 
 class Program
 {
@@ -16,8 +17,13 @@ class Program
         var factory = new InventorySystemFactory(provider);
 
         var inventory = new Inventory();
-        inventory.AddProduct(new Product { Name = "Laptop", Quantity = 5, Price = 1200 });
-        inventory.AddWarehouse(new Warehouse { Name = "Central", Capacity = 100 });
+
+        // DIP: Usando las interfaces en lugar de las clases concretas
+        IProduct laptop = new Product { Name = "Laptop", Quantity = 5, Price = 1200 };
+        IWarehouse centralWarehouse = new Warehouse { Name = "Central", Capacity = 100 };
+
+        inventory.AddProduct(laptop);
+        inventory.AddWarehouse(centralWarehouse);
 
         // Crear versión dinámica
         var system = factory.CreateSystem("AdvancedStochastic", inventory);

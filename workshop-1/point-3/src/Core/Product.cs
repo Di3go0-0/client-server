@@ -1,6 +1,10 @@
+using point_3.src.Interfaces;
+
 namespace point_3.src.Core;
+
 // SRP: Representa un producto en el inventario
-public class Product
+// DIP: Implementa la interfaz IProduct para desacoplar dependencias
+public class Product : IProduct
 {
     public required string Name { get; set; }
     public int Quantity { get; set; }

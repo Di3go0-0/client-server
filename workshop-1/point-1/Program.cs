@@ -9,7 +9,7 @@ internal class Program
 {
     static void Main()
     {
-        // Configuración de DI
+        // Configuración de DependencyInjection
         var services = new ServiceCollection();
 
         // Registrar algoritmos

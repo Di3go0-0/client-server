@@ -153,7 +153,7 @@ OpenCover/
 *.css
 *.sass
 *.less
-*.ts
+# *.ts
 *.js.map
 *.js
 *.jsx

@@ -9,3 +9,7 @@ export type UserEntity = {
 export type EmailExistType = {
   EmailExists: number
 }
+
+export type UserNameExistType = {
+  UserNameExist: number
+}

@@ -68,4 +68,20 @@ BEGIN
 END
 
 
+CREATE FUNCTION PKG_USERS_Login(p_email VARCHAR(100), p_password VARCHAR(255))
+RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE v_count INT;
 
+    SELECT COUNT(*) INTO v_count
+    FROM users
+    WHERE email = p_email
+      AND password = p_password;
+
+    IF v_count > 0 THEN
+        RETURN 1;  -- credenciales correctas
+    ELSE
+        RETURN 0;  -- credenciales incorrectas
+    END IF;
+END

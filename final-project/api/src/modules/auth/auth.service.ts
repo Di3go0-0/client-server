@@ -15,7 +15,7 @@ export class AuthService {
 
   async registerUser(body: RegisterType): Promise<number> {
     const hashedPassword = await hashpassword(body.password);
-    return this.authRepository.register(body)
+    return this.authRepository.register({ ...body, password: hashedPassword })
   }
 
   async login(body: LoginType): Promise<{ token: string }> {

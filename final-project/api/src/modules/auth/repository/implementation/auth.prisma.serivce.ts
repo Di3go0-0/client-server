@@ -4,7 +4,7 @@ import { DatabaseService } from "src/core/database/database.service";
 import { AuthSql } from "../../sql/auth.sql";
 import { AUTH_MESSAGES } from "../../constans";
 import { EmailExistType, UserNameExistType } from "../../entities";
-import { RegisterType } from "../../types";
+import { LoginType, RegisterType, UserType } from "../../types";
 
 @Injectable()
 export class AuthDbService implements AuthRepository {
@@ -14,6 +14,24 @@ export class AuthDbService implements AuthRepository {
     private readonly dbService: DatabaseService,
   ) { }
 
+  async Login(body: LoginType): Promise<UserType> {
+    const { email } = body
+    try {
+      const rows = await this.dbService.executeSelect<UserType>(AuthSql.GetUser, [email])
+
+      if (rows.length === 0) {
+        throw new HttpException(AUTH_MESSAGES.ERROR.CREDENTIALS, HttpStatus.NOT_FOUND);
+      }
+
+      const user = rows[0]
+
+      return user
+    } catch (err) {
+      if (err instanceof HttpException) { throw err; }
+      this.logger.error(err)
+      throw new HttpException('error', HttpStatus.BAD_REQUEST);
+    }
+  }
 
   async register(body: RegisterType): Promise<number> {
     const { userName, email, password } = body

@@ -15,7 +15,7 @@ export class RegisterDto {
 
   @ApiProperty({
     type: String,
-    example: 'usuario@correo.com',
+    example: 'pepito@correo.com',
     required: true,
     description: 'Correo electrónico del usuario',
   })

@@ -19,7 +19,17 @@ export class AuthService {
   }
 
   async login(body: LoginType): Promise<{ token: string }> {
-    return { token: 'asdfasdf' }
+    const hashedPassword = await hashpassword(body.password);
+    const user = await this.authRepository.Login({ ...body, password: hashedPassword });
+    const passwordMatch = await comparePassword(body.password, user.password)
+    if (!passwordMatch) {
+      this.logger.error(`Login Error, Password Not match: `);
+      throw new HttpException(AUTH_MESSAGES.ERROR.PASSWORD_NOT_MATCH, HttpStatus.BAD_REQUEST);
+    }
+
+    const token = this.jwtService.generateToken({ id: user.id, email: body.email });
+
+    return { token }
   }
 
 

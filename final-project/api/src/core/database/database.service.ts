@@ -83,5 +83,19 @@ export class DatabaseService {
       throw error;
     }
   }
+
+
+  /** Ejecuta un procedimiento almacenado */
+  async executeProcedure(
+    procedure: string,
+    params: Array<string | number> = [],
+  ): Promise<void> {
+    try {
+      await this.mysql.query(procedure, params);
+    } catch (error) {
+      this.logger.error(`Error en executeProcedure: ${error.message}`);
+      throw error;
+    }
+  }
 }
 

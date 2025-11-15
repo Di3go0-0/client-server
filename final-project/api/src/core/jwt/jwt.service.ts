@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import { ENV } from '../constans/env';
 import { JwtService as NestJwtService } from '@nestjs/jwt';
 import { GenerateTokenProps, TokenProps } from '../types/token.type';
 import { JWT_MESSAGES } from './constans/jwt.constans';
+import { ConstansService } from '../constans/constans.service';
 
 
 
@@ -13,12 +13,12 @@ export class JwtService {
 
   constructor(
     private readonly jwtService: NestJwtService,
+    private readonly constans: ConstansService
   ) {
-    this.secret = ENV.CONSTANS.SECRET_KEY;
+    this.secret = this.constans.getSecretKey()
   }
 
   generateToken(payload: GenerateTokenProps): string {
-    console.log(this.secret)
     return this.jwtService.sign(payload, {
       secret: this.secret,
       expiresIn: '12h',

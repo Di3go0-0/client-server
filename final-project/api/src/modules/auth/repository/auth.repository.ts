@@ -1,4 +1,5 @@
+import { RegisterType } from "../types";
 
 export abstract class AuthRepository {
-  abstract emailExist(email: string)
+  abstract register(body: RegisterType): Promise<number>
 }

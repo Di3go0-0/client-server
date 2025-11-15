@@ -25,10 +25,5 @@ export class AuthController {
     return this.authService.getUserInfo(req.user.id);
   }
 
-  @Get('emailExist')
-  async getUserAuth(): Promise<number> {
-    return this.authService.getEmailExist('d.rincon@utp.edu.co')
-  }
-
 
 }

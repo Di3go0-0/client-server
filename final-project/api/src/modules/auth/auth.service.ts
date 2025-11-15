@@ -15,7 +15,7 @@ export class AuthService {
 
   async registerUser(body: RegisterType): Promise<number> {
     const hashedPassword = await hashpassword(body.password);
-    return 1
+    return this.authRepository.register(body)
   }
 
   async login(body: LoginType): Promise<{ token: string }> {
@@ -28,7 +28,4 @@ export class AuthService {
   }
 
 
-  async getEmailExist(email: string): Promise<any> {
-    return await this.authRepository.emailExist(email)
-  }
 }

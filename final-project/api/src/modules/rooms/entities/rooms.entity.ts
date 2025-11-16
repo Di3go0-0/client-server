@@ -1,0 +1,7 @@
+export type RoomEntity = {
+  id: number;
+  name: string;
+  description: string;
+  owner_id: string;
+}
+

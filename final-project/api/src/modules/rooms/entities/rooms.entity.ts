@@ -5,3 +5,11 @@ export type RoomEntity = {
   owner_id: string;
 }
 
+
+export type RoomsActivesEntity = {
+  id: number;
+  name: string;
+  description: string;
+  active_users: string;
+}
+

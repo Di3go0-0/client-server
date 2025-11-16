@@ -11,6 +11,10 @@ export class RoomsService {
     private roomRepository: RoomRepository,
   ) { }
 
+  async GetAllRooms() {
+    return await this.roomRepository.GetAllRooms()
+  }
+
   async GetRoomsByUser(userId: number) {
     return await this.roomRepository.GetRoomsByUser(userId)
   }

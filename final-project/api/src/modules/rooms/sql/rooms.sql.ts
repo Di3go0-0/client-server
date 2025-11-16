@@ -19,4 +19,13 @@ export enum RoomsSql {
     WHERE ur.user_id = ?
     AND r.active = 1
   `,
+
+  getRoomsActives = `
+  SELECT 
+    vw.room_id as id,
+    vw.name,
+    vw.description,
+    vw.active_users
+  FROM vw_active_rooms vw;
+  `,
 }

@@ -16,6 +16,11 @@ export class RoomsController {
     private readonly roomsService: RoomsService,
   ) { }
 
+  @Get()
+  async getAllRooms() {
+    return await this.roomsService.GetAllRooms();
+  }
+
   @Get('by-user')
   async getRoomsByUser(@Request() req: any) {
     console.log(req.user.id)

@@ -43,7 +43,7 @@ export class JwtGuardService implements CanActivate {
     try {
       const payload = await this.jwtService.verifyToken(token);
 
-      const rows = await this.dbService.executeSelect<UserType>(JwtSql.GetUser, [payload.id, payload.id])
+      const rows = await this.dbService.executeSelect<UserType>(JwtSql.GetUser, [payload.email, payload.id])
 
       const user = rows[0]
 

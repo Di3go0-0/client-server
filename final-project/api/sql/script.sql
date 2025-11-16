@@ -12,7 +12,9 @@ CREATE TABLE rooms (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
     description TEXT,
-    active BOOLEAN NOT NULL DEFAULT TRUE
+    owner_id INT NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    FOREIGN KEY (owner_id) REFERENCES users(id)
 );
 
 CREATE TABLE user_rooms (
@@ -48,12 +50,6 @@ CREATE TABLE connections (
 
 
 
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    userName VARCHAR(50) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL
-);
 
 
 CREATE FUNCTION PKG_USERS_EmailExists(p_email VARCHAR(100))
@@ -108,20 +104,68 @@ BEGIN
 END
 
 
-CREATE FUNCTION PKG_USERS_Login(p_email VARCHAR(100), p_password VARCHAR(255))
-RETURNS INT
-DETERMINISTIC
+--- Rooms
+
+CREATE PROCEDURE PKG_ROOMS_DELETE(IN p_room_id INT)
 BEGIN
-    DECLARE v_count INT;
+    UPDATE rooms
+    SET active = 0
+    WHERE id = p_room_id;
+END 
 
-    SELECT COUNT(*) INTO v_count
-    FROM users
-    WHERE email = p_email
-      AND password = p_password;
 
-    IF v_count > 0 THEN
-        RETURN 1;  -- credenciales correctas
+CREATE PROCEDURE PKG_ROOMS_EXIST_ADMIN(
+    IN p_room_id INT,
+    IN p_admin_id INT
+)
+BEGIN
+    DECLARE v_new_owner INT;
+    -- Buscar el usuario más antiguo en la sala EXCEPTO el admin
+    SELECT user_id INTO v_new_owner
+    FROM user_rooms
+    WHERE room_id = p_room_id
+      AND user_id <> p_admin_id
+      AND active = 1
+    ORDER BY joined_at ASC
+    LIMIT 1;
+    -- Si NO existe otro usuario → eliminar sala
+    IF v_new_owner IS NULL THEN
+        CALL PKG_ROOMS_DELETE(p_room_id);
     ELSE
-        RETURN 0;  -- credenciales incorrectas
+        -- 1. Nuevo propietario
+        UPDATE rooms
+        SET owner_id = v_new_owner
+        WHERE id = p_room_id;
+        -- 2. Sacar al propietario anterior
+        UPDATE user_rooms
+        SET left_at = NOW(),
+            active = 0
+        WHERE room_id = p_room_id
+          AND user_id = p_admin_id
+          AND active = 1;
     END IF;
 END
+
+CREATE PROCEDURE PKG_ROOMS_EXIST(
+    IN p_user_id INT,
+    IN p_room_id INT
+)
+BEGIN
+    DECLARE v_owner INT;
+    -- Obtener el propietario de la sala
+    SELECT owner_id INTO v_owner
+    FROM rooms
+    WHERE id = p_room_id;
+    -- Si el usuario ES el propietario
+    IF v_owner = p_user_id THEN
+        CALL PKG_ROOMS_EXIST_ADMIN(p_room_id, p_user_id);
+    ELSE
+        -- Si NO es propietario → solo salir de la sala
+        UPDATE user_rooms
+        SET left_at = NOW(),
+            active = 0
+        WHERE user_id = p_user_id
+          AND room_id = p_room_id
+          AND active = 1;
+    END IF;
+END 

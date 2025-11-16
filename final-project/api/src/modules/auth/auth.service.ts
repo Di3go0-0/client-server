@@ -27,7 +27,7 @@ export class AuthService {
       throw new HttpException(AUTH_MESSAGES.ERROR.PASSWORD_NOT_MATCH, HttpStatus.BAD_REQUEST);
     }
 
-    const token = this.jwtService.generateToken({ id: user.id, email: body.email });
+    const token = this.jwtService.generateToken({ id: user.id, email: user.email });
 
     return { token }
   }

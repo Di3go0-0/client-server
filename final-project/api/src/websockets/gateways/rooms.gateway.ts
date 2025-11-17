@@ -28,6 +28,22 @@ export class RoomsGateway {
     }));
   }
 
+  private async notifyToggleUserOnlineAllHisRooms(userId: number) {
+    const roomsByUser = await this.roomsService.GetRoomsByUser(userId);
+    for (const room of roomsByUser) {
+      const users = await this.getFormattedUsersInRoom(room.id);
+
+      const usersActivesInRoom = `users_active_room_id_${room.id}`;
+      this.server.to(usersActivesInRoom).emit('users.room.updated', users);
+    }
+  }
+
+  @OnEvent('user.toogle.connection')
+  async handleUserToggledConnection(userId: number) {
+    await this.notifyToggleUserOnlineAllHisRooms(userId);
+  }
+
+
   // Obtener todas las Rooms
   @SubscribeMessage('get_rooms')
   async handleGetRooms() {
@@ -95,6 +111,8 @@ export class RoomsGateway {
   ) {
     const usersActivesInRoom = `users_active_room_id_${id}`;
     client.join(usersActivesInRoom);
+
+
     const users = await this.getFormattedUsersInRoom(id);
 
     this.server.to(client.id).emit('users.room.updated', users);

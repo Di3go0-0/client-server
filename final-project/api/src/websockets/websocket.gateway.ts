@@ -6,6 +6,7 @@ import { JwtService } from "src/core/jwt/jwt.service"; // Asegúrate de que la r
 import { DatabaseService } from "src/core/database/database.service"; // Asegúrate de que la ruta sea correcta
 import { JwtSql } from "src/core/jwt-guard/sql/jwt.sql"; // Asegúrate de que la ruta sea correcta
 import { UserType } from "src/modules/auth/types"; // Asegúrate de que la ruta sea correcta
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 
 @WebSocketGateway({ cors: { origin: '*' } }) // Quita @UseGuards aquí
@@ -19,6 +20,7 @@ export class GlobalGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService, // Inyecta JwtService
     private readonly dbService: DatabaseService, // Inyecta DatabaseService
+    private readonly eventEmitter: EventEmitter2,
   ) { }
 
   async handleConnection(client: Socket) { // Hazlo async para poder usar await
@@ -50,6 +52,7 @@ export class GlobalGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.usersService.addUser(client.id, { ...user, clientId: client.id }); // Add clientId to user before passing
       this.logger.log(`Client connected `);
       console.log(this.usersService.getAllUsers())
+      this.eventEmitter.emit('user.toogle.connection', user.id);
     } catch (error) {
       this.logger.error(`Authentication error for client ${client.id}: ${error.message}. Disconnecting.`);
       client.disconnect(true); // Desconecta al cliente por cualquier error de autenticación
@@ -58,8 +61,11 @@ export class GlobalGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleDisconnect(client: Socket) {
     this.logger.log("Desconexión global:", client.id);
+    const user = this.usersService.getUser(client.id)
     this.usersService.removeUser(client.id);
+    if (!user) return
     this.logger.log(`Client connected `);
     console.log(this.usersService.getAllUsers())
+    this.eventEmitter.emit('user.toogle.connection', user.id);
   }
 }

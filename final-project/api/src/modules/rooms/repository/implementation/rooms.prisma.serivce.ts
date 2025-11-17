@@ -6,6 +6,7 @@ import { RoomsSql } from "../../sql/rooms.sql";
 import { RoomUserType } from "../../types/exit-room.type";
 import { RoomEntity, RoomsActivesEntity } from "../../entities";
 import { UpdateRoomType } from "../../types/update-room.type";
+import { UsersInRoomType } from "../../types/users-room.type";
 
 @Injectable()
 export class RoomDbService implements RoomRepository {
@@ -128,14 +129,14 @@ export class RoomDbService implements RoomRepository {
     }
   }
 
-  async GetUsersInRoom(roomId: number): Promise<number[]> {
+  async GetUsersInRoom(roomId: number): Promise<UsersInRoomType[]> {
     try {
-      const rows = await this.dbService.executeSelect<{ user_id: number }>(
+      const rows = await this.dbService.executeSelect<UsersInRoomType>(
         RoomsSql.getUsersIdInRoom,
         [roomId]
       );
 
-      return rows.map(row => row.user_id);
+      return rows;
     } catch (err) {
       if (err instanceof HttpException) { throw err; }
       this.logger.error(err);

@@ -49,4 +49,9 @@ export class RoomsService {
     return await this.roomRepository.JoinRoom(body)
   }
 
+
+  async GetUsersInRoom(roomId: number) {
+    return await this.roomRepository.GetUsersInRoom(roomId)
+  }
+
 }

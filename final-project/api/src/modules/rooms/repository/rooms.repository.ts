@@ -10,4 +10,5 @@ export abstract class RoomRepository {
   abstract updateRoom(body: UpdateRoomType): Promise<boolean>;
   abstract exitRoom(body: RoomUserType): Promise<boolean>;
   abstract JoinRoom(body: RoomUserType): Promise<boolean>;
+  abstract GetUsersInRoom(roomId: number): Promise<number[]>;
 }

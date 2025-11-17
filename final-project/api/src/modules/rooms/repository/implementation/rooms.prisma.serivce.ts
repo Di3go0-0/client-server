@@ -123,4 +123,19 @@ export class RoomDbService implements RoomRepository {
     }
   }
 
+  async GetUsersInRoom(roomId: number): Promise<number[]> {
+    try {
+      const rows = await this.dbService.executeSelect<{ user_id: number }>(
+        RoomsSql.getUsersIdInRoom,
+        [roomId]
+      );
+
+      return rows.map(row => row.user_id);
+    } catch (err) {
+      if (err instanceof HttpException) { throw err; }
+      this.logger.error(err);
+      throw new HttpException('error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
 }

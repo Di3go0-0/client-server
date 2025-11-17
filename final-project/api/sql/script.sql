@@ -38,7 +38,6 @@ CREATE TABLE messages (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-
 CREATE OR REPLACE VIEW vw_active_users_in_rooms AS
 SELECT 
     ur.room_id,
@@ -363,10 +362,8 @@ BEGIN
 END $$
 DELIMITER ;
 
-
-
 DELIMITER $$
-CREATE PROCEDURE PKG_MENSSAGES_SEND(
+CREATE PROCEDURE PKG_MESSAGES_SEND(
     IN p_user_id INT,
     IN p_room_id INT,
     IN p_message VARCHAR(500),

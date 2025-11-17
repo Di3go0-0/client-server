@@ -32,17 +32,16 @@ export class AuthGateway
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`❌ Client disconnected: ${client.id}`);
     this.usersConnected.removeUser(client.id)
   }
 
 
   @SubscribeMessage('jwt')
-  async handleConnectUser(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-    console.log(data)
-    const result = await this.authService.getUserInfo(data);
+  async handleConnectUser(@MessageBody() { jwt }: { jwt: string }, @ConnectedSocket() client: Socket) {
+    const result = await this.authService.getUserInfo(jwt);
     const user: UserType = { ...result, clientId: client.id }
     this.usersConnected.addUser(client.id, user)
+    client.emit('jwt.success', user);
   }
 
 }

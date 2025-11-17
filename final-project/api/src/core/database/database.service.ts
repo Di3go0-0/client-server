@@ -51,6 +51,7 @@ export class DatabaseService {
   ): Promise<number | string> {
     try {
       const jsonString = JSON.stringify(dataJson);
+      this.logger.log(`Datos enviados al procedimiento: ${jsonString}`);
       const result = await this.mysql.execute(query, [jsonString]);
 
       return result.insertId ?? result;

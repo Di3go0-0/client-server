@@ -74,7 +74,7 @@ export class RoomsGateway {
 
 
   @SubscribeMessage('users.room.subscribe')
-  async handleFilmSubscribe(
+  async handleUsersSubscribe(
     @MessageBody() { id }: { id: number },
     @ConnectedSocket() client: Socket
   ) {

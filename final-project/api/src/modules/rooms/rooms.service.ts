@@ -31,12 +31,7 @@ export class RoomsService {
 
   async udpateRoom(body: UpdateRoomType) {
     const response = await this.roomRepository.updateRoom(body)
-    this.eventEmitter.emit('room.updated', {
-      id: body.roomId,
-      name: body.name,
-      description: body.description,
-      owner_id: body.userId
-    })
+    this.eventEmitter.emit('room.updated', response)
 
     return response
   }

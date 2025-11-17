@@ -73,9 +73,9 @@ export class RoomDbService implements RoomRepository {
     }
   }
 
-  async updateRoom(body: UpdateRoomType): Promise<boolean> {
+  async updateRoom(body: UpdateRoomType): Promise<RoomEntity> {
     try {
-      const rows = await this.dbService.executeProcedure(
+      await this.dbService.executeProcedure(
         RoomsSql.updateRoom,
         [
           body.roomId,
@@ -85,7 +85,12 @@ export class RoomDbService implements RoomRepository {
         ]
       )
 
-      return true
+      const Room = await this.dbService.executeSelect<RoomEntity>(
+        RoomsSql.GetRoomById,
+        [body.roomId]
+      )
+
+      return Room[0]
     } catch (err) {
       if (err instanceof HttpException) { throw err; }
       this.logger.error(err)

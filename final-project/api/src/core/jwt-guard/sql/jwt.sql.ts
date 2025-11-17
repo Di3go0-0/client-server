@@ -3,8 +3,7 @@ export enum JwtSql {
     SELECT
       u.id,
       u.userName,
-      u.email,
-      u.password
+      u.email
     FROM users u 
     WHERE  u.email = ? 
     AND u.id = ?

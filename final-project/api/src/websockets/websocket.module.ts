@@ -9,6 +9,7 @@ import { MessagesModule } from "src/modules/messages/messages.module";
 import { JwtGuardModule } from "src/core/jwt-guard/jwt-guard.module";
 import { DatabaseModule } from "src/core/database/database.module";
 import { GlobalGateway } from "./websocket.gateway";
+import { UsersGateway } from "./gateways/users.gateway";
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { GlobalGateway } from "./websocket.gateway";
     AuthGateway,
     MessageGateway,
     UsersService,
+    UsersGateway
   ],
 })
 export class WebSocketModule { }

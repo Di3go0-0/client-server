@@ -3,7 +3,10 @@ import { Server, Socket } from 'socket.io';
 import { UsersService } from './services/users.service';
 import { MessagesService } from 'src/modules/messages/messages.service';
 import type { SendMessageType } from './types/send-message.type';
+import { UseGuards } from '@nestjs/common';
+import { JwtSocketGuardService } from 'src/core/jwt-guard/jwt-socket-guard.service';
 
+@UseGuards(JwtSocketGuardService)
 @WebSocketGateway({ cors: { origin: '*' } })
 export class MessageGateway {
   @WebSocketServer()
@@ -24,7 +27,6 @@ export class MessageGateway {
     const messages = await this.messagesService.getMesagesByRoom(id);
 
     this.server.to(client.id).emit('messages.suscription', messages);
-    // console.log(this.server)
   }
 
   @SubscribeMessage('users-send.message')
@@ -32,14 +34,11 @@ export class MessageGateway {
     @MessageBody() body: SendMessageType,
     @ConnectedSocket() client: Socket
   ) {
-    console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
     const roomMessages = `m_room_id_${body.roomId}`;
 
-    const user = this.usersConnected.getUser(client.id)
-    console.log('Usuario conectado:', user, 'clientId:', client.id);
+    const user = client.data.user
     if (!user) return;
 
-    console.log({ ...body, userId: user.id })
     const message = await this.messagesService.sendMessasge({ ...body, userId: user.id })
 
     this.server.to(roomMessages).emit('messages.suscription', message);

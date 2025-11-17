@@ -20,10 +20,10 @@ export class AuthController {
     return this.authService.registerUser(body);
   }
 
-  @Post('userInfo')
-  async getUserInfo(@Request() req: any): Promise<number> {
-    return this.authService.getUserInfo(req.user.id);
-  }
+  // @Post('userInfo')
+  // async getUserInfo(@Request() req: any): Promise<number> {
+  //   return this.authService.getUserInfo(req.user.id);
+  // }
 
 
 }

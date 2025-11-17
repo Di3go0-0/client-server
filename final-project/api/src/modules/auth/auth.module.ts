@@ -17,6 +17,7 @@ import { DatabaseModule } from 'src/core/database/database.module';
       useClass: AuthDbService,
     }
   ],
-  controllers: [AuthController]
+  controllers: [AuthController],
+  exports: [AuthService],
 })
 export class AuthModule { }

@@ -3,7 +3,7 @@ import { AuthRepository } from "../auth.repository";
 import { DatabaseService } from "src/core/database/database.service";
 import { AuthSql } from "../../sql/auth.sql";
 import { AUTH_MESSAGES } from "../../constans";
-import { EmailExistType, UserNameExistType } from "../../entities";
+import { EmailExistType, UserExposeEntity, UserNameExistType } from "../../entities";
 import { LoginType, RegisterType, UserType } from "../../types";
 
 @Injectable()
@@ -53,6 +53,19 @@ export class AuthDbService implements AuthRepository {
       if (err instanceof HttpException) { throw err; }
       this.logger.error(err)
       return 0;
+    }
+  }
+
+
+  async getUser(id: number): Promise<UserExposeEntity> {
+    try {
+      const user = await this.dbService.executeSelect<UserExposeEntity>(AuthSql.GetUserById, [id])
+
+      return user[0]
+    } catch (err) {
+      if (err instanceof HttpException) { throw err; }
+      this.logger.error(err)
+      throw new HttpException('error', HttpStatus.BAD_REQUEST);
     }
   }
 

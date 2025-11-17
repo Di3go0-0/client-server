@@ -5,6 +5,7 @@ export type UserEntity = {
   password: string;
 }
 
+export type UserExposeEntity = Omit<UserEntity, 'password'>
 
 export type EmailExistType = {
   EmailExists: number

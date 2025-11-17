@@ -17,4 +17,12 @@ export enum AuthSql {
     FROM users u 
     WHERE  u.email = ? 
   `,
+  GetUserById = ` 
+    SELECT
+      u.id,
+      u.userName,
+      u.email
+    FROM users u 
+    WHERE  u.id = ? 
+  `
 }

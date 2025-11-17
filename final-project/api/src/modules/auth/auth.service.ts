@@ -4,13 +4,14 @@ import { LoginType, RegisterType } from './types';
 import { JwtService } from 'src/core/jwt/jwt.service';
 import { comparePassword, hashpassword } from './helpers';
 import { AUTH_MESSAGES } from './constans';
+import { UserExposeEntity } from './entities';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
   constructor(
     private readonly authRepository: AuthRepository,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
   ) { }
 
   async registerUser(body: RegisterType): Promise<number> {
@@ -33,9 +34,9 @@ export class AuthService {
   }
 
 
-  async getUserInfo(id: number): Promise<any> {
-    return 'a'
+  async getUserInfo(token: string) {
+    const payload = await this.jwtService.verifyToken(token);
+    return await this.authRepository.getUser(payload.id)
   }
-
 
 }

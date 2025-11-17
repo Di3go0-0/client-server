@@ -149,7 +149,7 @@ OpenCover/
 *.cssx
 *.e2e.ts
 *.html
-*.json
+# *.json
 *.css
 *.sass
 *.less

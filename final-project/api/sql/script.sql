@@ -38,14 +38,6 @@ CREATE TABLE messages (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-CREATE TABLE connections (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    connected_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    disconnected_at DATETIME NULL,
-    active BOOLEAN NOT NULL DEFAULT TRUE,
-    FOREIGN KEY (user_id) REFERENCES users(id)
-);
 
 CREATE OR REPLACE VIEW vw_active_users_in_rooms AS
 SELECT 

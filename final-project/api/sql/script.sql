@@ -365,5 +365,43 @@ DELIMITER ;
 
 
 
-SET @room_id = 0;
+DELIMITER $$
+CREATE PROCEDURE PKG_MENSSAGES_SEND(
+    IN p_user_id INT,
+    IN p_room_id INT,
+    IN p_message VARCHAR(500),
+    OUT p_message_id INT
+)
+BEGIN
+    DECLARE v_user_exists INT;
+    DECLARE v_room_exists INT;
 
+    SELECT COUNT(*) INTO v_user_exists
+    FROM users
+    WHERE id = p_user_id AND active = 1;
+
+    IF v_user_exists = 0 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'El usuario no existe o está inactivo.';
+    END IF;
+
+    SELECT COUNT(*) INTO v_room_exists
+    FROM rooms
+    WHERE id = p_room_id AND active = 1;
+
+    IF v_room_exists = 0 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'La sala no existe o está inactiva.';
+    END IF;
+
+    INSERT INTO messages (user_id, room_id, message)
+    VALUES (p_user_id, p_room_id, p_message);
+
+    SET p_message_id = LAST_INSERT_ID();
+END $$
+DELIMITER ;
+
+
+
+SET @room_id = 0;
+SET @message_id = 0;

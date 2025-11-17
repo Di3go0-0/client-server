@@ -2,6 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { RoomRepository } from './repository';
 import { CreateRoomType } from './types/create-room-type';
 import { RoomUserType } from './types/exit-room.type';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { UpdateRoomType } from './types/update-room.type';
 
 @Injectable()
 export class RoomsService {
@@ -9,7 +11,9 @@ export class RoomsService {
 
   constructor(
     private roomRepository: RoomRepository,
+    private readonly eventEmitter: EventEmitter2
   ) { }
+
 
   async GetAllRooms() {
     return await this.roomRepository.GetAllRooms()
@@ -20,7 +24,21 @@ export class RoomsService {
   }
 
   async createRoom(body: CreateRoomType) {
-    return await this.roomRepository.createRoom(body)
+    const response = await this.roomRepository.createRoom(body)
+    this.eventEmitter.emit('room.created', response);
+    return response
+  }
+
+  async udpateRoom(body: UpdateRoomType) {
+    const response = await this.roomRepository.updateRoom(body)
+    this.eventEmitter.emit('room.updated', {
+      id: body.roomId,
+      name: body.name,
+      description: body.description,
+      owner_id: body.userId
+    })
+
+    return response
   }
 
   async exitRoom(body: RoomUserType) {

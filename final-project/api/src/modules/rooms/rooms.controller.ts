@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Logger, Post, Query, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Logger, Post, Put, Query, Request, UseGuards } from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 import { CreateRoomDto } from './dtos/create-room.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtGuardService } from 'src/core/jwt-guard/jwt-guard.service';
 import { RoomIdDto } from './dtos/room-id.dto';
+import { UpdateRoomDto } from './dtos/update-room.dto';
 
 @ApiTags('Rooms')
 @ApiBearerAuth('Token')
@@ -23,7 +24,6 @@ export class RoomsController {
 
   @Get('by-user')
   async getRoomsByUser(@Request() req: any) {
-    console.log(req.user.id)
     return await this.roomsService.GetRoomsByUser(req.user.id);
   }
 
@@ -35,6 +35,11 @@ export class RoomsController {
   @Post('join')
   async JoinRoom(@Request() req: any, @Query() body: RoomIdDto) {
     return await this.roomsService.JoinRoom({ ...body, userId: req.user.id });
+  }
+
+  @Put()
+  async updateRoom(@Request() req: any, @Body() body: UpdateRoomDto) {
+    return await this.roomsService.udpateRoom({ ...body, userId: req.user.id })
   }
 
   @Delete('exit')

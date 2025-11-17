@@ -5,6 +5,7 @@ import { CreateRoomType } from "../../types/create-room-type";
 import { RoomsSql } from "../../sql/rooms.sql";
 import { RoomUserType } from "../../types/exit-room.type";
 import { RoomEntity, RoomsActivesEntity } from "../../entities";
+import { UpdateRoomType } from "../../types/update-room.type";
 
 @Injectable()
 export class RoomDbService implements RoomRepository {
@@ -44,12 +45,41 @@ export class RoomDbService implements RoomRepository {
   }
 
 
-  async createRoom(body: CreateRoomType): Promise<boolean> {
+  async createRoom(body: CreateRoomType): Promise<RoomEntity> {
     try {
-      const rows = await this.dbService.executeProcedure(
+      await this.dbService.executeProcedure(
         RoomsSql.CreateRoom,
         [
           body.owner_id,
+          body.name,
+          body.description
+        ]
+      )
+      const roomId = await this.dbService.executeSelect<{ room_id: number }>(
+        RoomsSql.GetIdCreatedRoom
+      )
+
+      const Room = await this.dbService.executeSelect<RoomEntity>(
+        RoomsSql.GetRoomById,
+        [roomId[0].room_id]
+      )
+
+      return Room[0]
+
+    } catch (err) {
+      if (err instanceof HttpException) { throw err; }
+      this.logger.error(err)
+      throw new HttpException('error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async updateRoom(body: UpdateRoomType): Promise<boolean> {
+    try {
+      const rows = await this.dbService.executeProcedure(
+        RoomsSql.updateRoom,
+        [
+          body.roomId,
+          body.userId,
           body.name,
           body.description
         ]

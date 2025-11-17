@@ -6,7 +6,10 @@ import { DatabaseModule } from 'src/core/database/database.module';
 import { JwtGuardModule } from 'src/core/jwt-guard/jwt-guard.module';
 
 @Module({
-  imports: [DatabaseModule, JwtGuardModule],
+  imports: [
+    DatabaseModule,
+    JwtGuardModule,
+  ],
   controllers: [RoomsController],
   providers: [
     RoomsService,
@@ -14,6 +17,7 @@ import { JwtGuardModule } from 'src/core/jwt-guard/jwt-guard.module';
       provide: RoomRepository,
       useClass: RoomDbService,
     }
-  ]
+  ],
+  exports: [RoomsService],
 })
 export class RoomsModule { }

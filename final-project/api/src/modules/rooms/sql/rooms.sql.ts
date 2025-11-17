@@ -1,10 +1,25 @@
 export enum RoomsSql {
 
-  CreateRoom = ` CALL PKG_ROOMS_CREATE(?, ?, ?)`,
+  CreateRoom = ` CALL PKG_ROOMS_CREATE(?, ?, ?, @room_id)`,
+
+  GetIdCreatedRoom = `SELECT @room_id AS room_id`,
+
+  updateRoom = ` CALL PKG_ROOMS_UPDATE(?,?,?,?) `,
 
   ExitRoom = ` CALL PKG_ROOMS_EXIST(?, ?)`,
 
   JoinRoom = ` CALL PKG_ROOMS_ADD_USER(?, ?)`,
+
+  GetRoomById = `
+  SELECT 
+      r.id,
+      r.name,
+      r.description,
+      r.owner_id 
+    FROM rooms r
+    WHERE r.id = ?
+    AND r.active = 1
+  `,
 
   GetRoomByUser = ` 
     SELECT 

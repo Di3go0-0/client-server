@@ -43,4 +43,12 @@ export enum RoomsSql {
     vw.active_users
   FROM vw_active_rooms vw;
   `,
+
+  getUsersIdInRoom = `
+    SELECT 
+      ur.user_id 
+    FROM user_rooms ur 
+    WHERE ur.room_id = ?
+    AND ur.active = 1
+`,
 }

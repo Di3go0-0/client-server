@@ -45,9 +45,13 @@ export enum RoomsSql {
   `,
 
   getUsersIdInRoom = `
-    SELECT 
-      ur.user_id 
-    FROM user_rooms ur 
+    SELECT
+      ur.user_id,
+      u.username,
+      u.email,
+      false AS "online"
+    FROM user_rooms ur
+    INNER JOIN users u ON u.id = ur.user_id
     WHERE ur.room_id = ?
     AND ur.active = 1
 `,

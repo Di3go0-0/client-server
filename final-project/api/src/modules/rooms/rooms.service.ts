@@ -45,12 +45,9 @@ export class RoomsService {
   }
 
 
-  async GetUsersIdInRoom(roomId: number) {
-    return await this.roomRepository.GetUsersInRoom(roomId)
+  async GetUsersDetailInRoom(roomId: number) {
+    return await this.roomRepository.GetUsersInRoom(roomId);
   }
 
-  async GetUsersDetailInRoom(roomId: number) {
-    return await this.roomRepository.GetUsersInRoom(roomId)
-  }
 
 }

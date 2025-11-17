@@ -1,39 +1,14 @@
-import {
-  WebSocketGateway,
-  WebSocketServer,
-  SubscribeMessage,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-  MessageBody,
-  ConnectedSocket,
-} from '@nestjs/websockets';
+import { WebSocketGateway, WebSocketServer, SubscribeMessage, MessageBody, ConnectedSocket } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { OnEvent } from '@nestjs/event-emitter';
 import { AuthService } from 'src/modules/auth/auth.service';
-import { UserType } from './types/user.type';
-import { UsersService } from './services/users.service';
 import type { LoginType, RegisterType } from 'src/modules/auth/types';
 
 @WebSocketGateway({ cors: { origin: '*' } })
-export class AuthGateway
-  implements OnGatewayConnection, OnGatewayDisconnect {
+export class AuthGateway {
   @WebSocketServer()
   server: Server;
 
-  constructor(
-    private readonly authService: AuthService,
-    private readonly usersConnected: UsersService,
-  ) {
-  }
-
-  handleConnection(client: Socket) {
-    // console.log(`🔌 Client connected: ${client.id}`);
-
-  }
-
-  handleDisconnect(client: Socket) {
-    this.usersConnected.removeUser(client.id)
-  }
+  constructor(private readonly authService: AuthService) { }
 
   @SubscribeMessage('auth.login')
   async handleLogin(
@@ -70,16 +45,6 @@ export class AuthGateway
     } catch (err) {
       return { success: false, message: err.message };
     }
-  }
-
-  @SubscribeMessage('jwt')
-  async handleConnectUser(@MessageBody() { jwt }: { jwt: string }, @ConnectedSocket() client: Socket) {
-    const result = await this.authService.getUserInfo(jwt);
-    const user: UserType = { ...result, clientId: client.id }
-    this.usersConnected.addUser(client.id, user)
-    client.emit('jwt.success', user);
-    console.log('=============================================================================')
-    console.log(client.handshake.auth)
   }
 }
 

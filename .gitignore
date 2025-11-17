@@ -155,7 +155,7 @@ OpenCover/
 *.less
 # *.ts
 *.js.map
-*.js
+# *.js
 *.jsx
 
 # Deployment projects

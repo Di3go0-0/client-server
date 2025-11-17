@@ -1,5 +1,4 @@
 import { Module } from "@nestjs/common";
-import { WebSocketGateway } from "./websocket.gateway";
 import { RoomsGateway } from "./gateways/rooms.gateway";
 import { RoomsModule } from "src/modules/rooms/rooms.module";
 import { AuthGateway } from "./gateways/auth.gateway";
@@ -9,6 +8,7 @@ import { MessageGateway } from "./gateways/message.gateway";
 import { MessagesModule } from "src/modules/messages/messages.module";
 import { JwtGuardModule } from "src/core/jwt-guard/jwt-guard.module";
 import { DatabaseModule } from "src/core/database/database.module";
+import { GlobalGateway } from "./websocket.gateway";
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { DatabaseModule } from "src/core/database/database.module";
     JwtGuardModule,
   ],
   providers: [
-    WebSocketGateway,
+    GlobalGateway,
     RoomsGateway,
     AuthGateway,
     MessageGateway,

@@ -50,7 +50,11 @@ export class RoomsService {
   }
 
 
-  async GetUsersInRoom(roomId: number) {
+  async GetUsersIdInRoom(roomId: number) {
+    return await this.roomRepository.GetUsersInRoom(roomId)
+  }
+
+  async GetUsersDetailInRoom(roomId: number) {
     return await this.roomRepository.GetUsersInRoom(roomId)
   }
 

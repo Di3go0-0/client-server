@@ -46,7 +46,7 @@ export class RoomsGateway {
     const roomSocketId = `room_id_${roomId}`;
     client.join(roomSocketId);
 
-    const ids = await this.roomsService.GetUsersInRoom(roomId);
+    const ids = await this.roomsService.GetUsersIdInRoom(roomId);
     const users = ids.map(id => this.usersConnected.getUserById(id));
 
     // Notificar a todos los suscriptores de la sala
@@ -66,7 +66,7 @@ export class RoomsGateway {
     const roomSocketId = `room_id_${roomId}`;
     client.leave(roomSocketId);
 
-    const ids = await this.roomsService.GetUsersInRoom(roomId);
+    const ids = await this.roomsService.GetUsersIdInRoom(roomId);
     const users = ids.map(id => this.usersConnected.getUserById(id));
 
     this.server.to(roomSocketId).emit('users.room.updated', users);
@@ -80,7 +80,7 @@ export class RoomsGateway {
   ) {
     const roomIdUsers = `room_id_${id}`;
     client.join(roomIdUsers);
-    const ids = await this.roomsService.GetUsersInRoom(id);
+    const ids = await this.roomsService.GetUsersIdInRoom(id);
     const users = ids.map(id => this.usersConnected.getUserById(id));
 
     this.server.to(client.id).emit('users.room.updated', users);
@@ -90,7 +90,7 @@ export class RoomsGateway {
   async handleFilmCreated(id: number) {
     const roomIdUsers = `room_id_${id}`;
 
-    const ids = await this.roomsService.GetUsersInRoom(id);
+    const ids = await this.roomsService.GetUsersIdInRoom(id);
     const users = ids.map(id => this.usersConnected.getUserById(id));
 
     // Mandas la nueva lista a TODOS los subscriptores

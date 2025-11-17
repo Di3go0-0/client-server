@@ -60,7 +60,6 @@ WHERE ur.active = 1
   AND u.active = 1;
 
 
-
 CREATE OR REPLACE VIEW vw_active_rooms AS
 SELECT 
     r.id AS room_id,
@@ -79,6 +78,7 @@ JOIN users u ON u.id = r.owner_id
 WHERE r.active = 1;
 
 
+DELIMITER $$
 CREATE FUNCTION PKG_USERS_EmailExists(p_email VARCHAR(100))
 RETURNS INT
 DETERMINISTIC
@@ -93,9 +93,10 @@ BEGIN
     ELSE
         RETURN 0;
     END IF;
-END
+END $$
+DELIMITER ;
 
-
+DELIMITER $$
 CREATE FUNCTION PKG_USERS_UserNameExists(p_username VARCHAR(50))
 RETURNS INT
 DETERMINISTIC
@@ -110,9 +111,10 @@ BEGIN
     ELSE
         RETURN 0;
     END IF;
-END
+END $$
+DELIMITER ;
 
-
+DELIMITER $$
 CREATE PROCEDURE PKG_USERS_CreateUser(
     IN p_userName VARCHAR(50),
     IN p_email VARCHAR(100),
@@ -128,18 +130,21 @@ BEGIN
         INSERT INTO users (userName, email, password)
         VALUES (p_userName, p_email, p_password);
     END IF;
-END
+END $$
+DELIMITER ;
 
 
---- Rooms
-
+-- Rooms
+DELIMITER $$
 CREATE PROCEDURE PKG_ROOMS_DELETE(IN p_room_id INT)
 BEGIN
     UPDATE rooms
     SET active = 0
     WHERE id = p_room_id;
-END 
+END $$
+DELIMITER ;
 
+DELIMITER $$
 CREATE PROCEDURE PKG_ROOMS_EXIST_ADMIN(
     IN p_room_id INT,
     IN p_admin_id INT
@@ -170,8 +175,10 @@ BEGIN
           AND user_id = p_admin_id
           AND active = 1;
     END IF;
-END
+END $$
+DELIMITER ;
 
+DELIMITER $$
 CREATE PROCEDURE PKG_ROOMS_EXIST(
     IN p_user_id INT,
     IN p_room_id INT
@@ -194,10 +201,10 @@ BEGIN
           AND room_id = p_room_id
           AND active = 1;
     END IF;
-END 
+END $$
+DELIMITER ;
 
-
-
+DELIMITER $$
 CREATE PROCEDURE PKG_ROOMS_ADD_USER(
     IN p_user_id INT,
     IN p_room_id INT
@@ -255,43 +262,116 @@ BEGIN
         INSERT INTO user_rooms (user_id, room_id)
         VALUES (p_user_id, p_room_id);
     END IF;
-END 
+END $$
+DELIMITER ;
 
-
+DELIMITER $$
 CREATE PROCEDURE PKG_ROOMS_CREATE(
     IN p_owner_id INT,
     IN p_room_name VARCHAR(100),
-    IN p_description TEXT
+    IN p_description TEXT,
+    OUT p_room_id INT
 )
 BEGIN
     DECLARE v_user_exists INT;
     DECLARE v_room_exists INT;
-    DECLARE v_new_room_id INT;
-    -- 1. Validar que el usuario exista y esté activo
+
     SELECT COUNT(*) INTO v_user_exists
     FROM users
     WHERE id = p_owner_id AND active = 1;
+
     IF v_user_exists = 0 THEN
         SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'El usuario no existe o está inactivo.';
     END IF;
-    -- 2. Validar que no exista otra sala con el mismo nombre
+
     SELECT COUNT(*) INTO v_room_exists
     FROM rooms
     WHERE name = p_room_name AND active = 1;
+
     IF v_room_exists > 0 THEN
         SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'Ya existe una sala activa con ese nombre.';
     END IF;
-    -- 3. Crear la sala
+
     INSERT INTO rooms (name, description, owner_id)
     VALUES (p_room_name, p_description, p_owner_id);
-    -- Obtener ID de la sala recién creada
-    SET v_new_room_id = LAST_INSERT_ID();
-    -- 4. Insertar al owner dentro de user_rooms como miembro activo
+
+    SET p_room_id = LAST_INSERT_ID();
+
     INSERT INTO user_rooms (user_id, room_id)
-    VALUES (p_owner_id, v_new_room_id);
-    -- 5. Retornar el id de la sala creada
-    SELECT v_new_room_id AS room_id;
-END
+    VALUES (p_owner_id, p_room_id);
+
+END $$
+DELIMITER ;
+
+
+
+DELIMITER $$
+CREATE PROCEDURE PKG_ROOMS_UPDATE(
+    IN p_room_id INT,
+    IN p_user_id INT,
+    IN p_name VARCHAR(100),
+    IN p_description TEXT
+)
+BEGIN
+    DECLARE v_room_exists INT;
+    DECLARE v_user_exists INT;
+    DECLARE v_owner_id INT;
+    DECLARE v_name_exists INT;
+
+    -- 1. Validar que el usuario exista y esté activo
+    SELECT COUNT(*) INTO v_user_exists
+    FROM users
+    WHERE id = p_user_id AND active = 1;
+
+    IF v_user_exists = 0 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'El usuario no existe o está inactivo.';
+    END IF;
+
+    -- 2. Validar que la sala exista y esté activa
+    SELECT COUNT(*) INTO v_room_exists
+    FROM rooms
+    WHERE id = p_room_id AND active = 1;
+
+    IF v_room_exists = 0 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'La sala no existe o está inactiva.';
+    END IF;
+
+    -- 3. Verificar que el usuario sea el propietario
+    SELECT owner_id INTO v_owner_id
+    FROM rooms
+    WHERE id = p_room_id;
+
+    IF v_owner_id <> p_user_id THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'No tienes permisos para modificar esta sala.';
+    END IF;
+
+    -- 4. Validar que el nuevo nombre no esté tomado por otra sala activa
+    SELECT COUNT(*) INTO v_name_exists  
+    FROM rooms
+    WHERE name = p_name
+      AND active = 1
+      AND id <> p_room_id;
+
+    IF v_name_exists > 0 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Ya existe otra sala activa con ese nombre.';
+    END IF;
+
+    -- 5. Actualizar la sala
+    UPDATE rooms
+    SET name = p_name,
+        description = p_description
+    WHERE id = p_room_id;
+
+END $$
+DELIMITER ;
+
+
+
+SET @room_id = 0;
 

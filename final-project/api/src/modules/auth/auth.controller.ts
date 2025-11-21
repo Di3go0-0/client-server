@@ -1,7 +1,8 @@
-import { Body, Controller, Post, Request, Get } from '@nestjs/common';
+import { Body, Controller, Post, Request, Get, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from './dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtGuardService } from 'src/core/jwt-guard/jwt-guard.service';
 
 @ApiTags('Auth')
 @ApiBearerAuth('Token')
@@ -20,10 +21,10 @@ export class AuthController {
     return this.authService.registerUser(body);
   }
 
-  // @Post('userInfo')
-  // async getUserInfo(@Request() req: any): Promise<number> {
-  //   return this.authService.getUserInfo(req.user.id);
-  // }
-
-
+  @ApiBearerAuth('Token')
+  @UseGuards(JwtGuardService)
+  @Get('userInfo')
+  async getUserInfo(@Request() req: any) {
+    return this.authService.getUserInfo(req.user.id);
+  }
 }

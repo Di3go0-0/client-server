@@ -34,9 +34,8 @@ export class AuthService {
   }
 
 
-  async getUserInfo(token: string) {
-    const payload = await this.jwtService.verifyToken(token);
-    return await this.authRepository.getUser(payload.id)
+  async getUserInfo(id: number) {
+    return await this.authRepository.getUser(id)
   }
 
 }

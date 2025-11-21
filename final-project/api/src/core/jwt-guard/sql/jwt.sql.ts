@@ -6,6 +6,5 @@ export enum JwtSql {
       u.email
     FROM users u 
     WHERE  u.email = ? 
-    AND u.id = ?
   `,
 }

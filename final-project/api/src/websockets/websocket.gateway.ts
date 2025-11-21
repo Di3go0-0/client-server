@@ -37,7 +37,7 @@ export class GlobalGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const payload = await this.jwtService.verifyToken(token);
       this.logger.debug(`Token payload for ${client.id}: ${JSON.stringify(payload)}`);
 
-      const rows = await this.dbService.executeSelect<UserType>(JwtSql.GetUser, [payload.email, payload.id])
+      const rows = await this.dbService.executeSelect<UserType>(JwtSql.GetUser, [payload.email])
       const user = rows[0]
 
       if (!user) {

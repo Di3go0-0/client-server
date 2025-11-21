@@ -4,7 +4,7 @@ const socket = io("http://localhost:3100", {
   transports: ["websocket"],
   auth: {
     token:
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NywiZW1haWwiOiJwZXBpdG9AY29ycmVvLmNvbSIsImlhdCI6MTc2MzQwMjY2NSwiZXhwIjoxNzYzNDQ1ODY1fQ.zuT1RpJUCQJEm3NHDgmNngE44O5RNI_7LZl3F124zPg", // token falso
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OCwiZW1haWwiOiJwZXBpdG9zQGNvcnJlby5jb20iLCJpYXQiOjE3NjM0MDk3MTIsImV4cCI6MTc2MzQ1MjkxMn0.bWPImPWQHNyMuYQyx2S3_OgwWcFmkLrw4a1HpOwzCpI", // token falso
   },
 });
 

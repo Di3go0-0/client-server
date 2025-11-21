@@ -53,6 +53,9 @@ export class GlobalGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.log(`Client connected `);
       this.eventEmitter.emit('user.toogle.connection', user.id);
       this.eventEmitter.emit('update.users.actives');
+      console.log("------------------------------------------------------------")
+      console.log("------------------------------------------------------------")
+      console.log("Conexion establecida")
     } catch (error) {
       this.logger.error(`Authentication error for client ${client.id}: ${error.message}. Disconnecting.`);
       client.disconnect(true); // Desconecta al cliente por cualquier error de autenticación
@@ -68,5 +71,9 @@ export class GlobalGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(this.usersService.getAllUsers())
     this.eventEmitter.emit('user.toogle.connection', user.id);
     this.eventEmitter.emit('update.users.actives');
+
+    console.log("------------------------------------------------------------")
+    console.log("------------------------------------------------------------")
+    console.log("Conexion perdida")
   }
 }

@@ -7,6 +7,7 @@ import { RoomUserType } from "../../types/exit-room.type";
 import { RoomEntity, RoomsActivesEntity } from "../../entities";
 import { UpdateRoomType } from "../../types/update-room.type";
 import { UsersInRoomType } from "../../types/users-room.type";
+import { TotalCountType } from "../../types/total-count.type";
 
 @Injectable()
 export class RoomDbService implements RoomRepository {
@@ -45,6 +46,24 @@ export class RoomDbService implements RoomRepository {
     }
   }
 
+  async GetRoom(id: number): Promise<RoomEntity> {
+    try {
+      const roomId = await this.dbService.executeSelect<{ room_id: number }>(
+        RoomsSql.GetIdCreatedRoom
+      )
+
+      const Room = await this.dbService.executeSelect<RoomEntity>(
+        RoomsSql.GetRoomById,
+        [roomId[0].room_id]
+      )
+      return Room[0]
+    } catch (err) {
+      if (err instanceof HttpException) { throw err; }
+      this.logger.error(err)
+      throw new HttpException('error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
 
   async createRoom(body: CreateRoomType): Promise<RoomEntity> {
     try {
@@ -60,13 +79,9 @@ export class RoomDbService implements RoomRepository {
         RoomsSql.GetIdCreatedRoom
       )
 
-      const Room = await this.dbService.executeSelect<RoomEntity>(
-        RoomsSql.GetRoomById,
-        [roomId[0].room_id]
-      )
+      const room = await this.GetRoom(roomId[0].room_id);
 
-      return Room[0]
-
+      return room
     } catch (err) {
       if (err instanceof HttpException) { throw err; }
       this.logger.error(err)
@@ -137,6 +152,22 @@ export class RoomDbService implements RoomRepository {
       );
 
       return rows;
+    } catch (err) {
+      if (err instanceof HttpException) { throw err; }
+      this.logger.error(err);
+      throw new HttpException('error', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+
+  async ExistRoom(roomId: number): Promise<TotalCountType> {
+    try {
+      const rows = await this.dbService.executeSelect<TotalCountType>(
+        RoomsSql.ExistRoom,
+        [roomId]
+      );
+
+      return rows[0];
     } catch (err) {
       if (err instanceof HttpException) { throw err; }
       this.logger.error(err);

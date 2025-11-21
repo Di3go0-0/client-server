@@ -37,7 +37,13 @@ export class RoomsService {
   }
 
   async exitRoom(body: RoomUserType) {
-    return await this.roomRepository.exitRoom(body)
+    await this.roomRepository.exitRoom(body)
+    const room = await this.roomRepository.ExistRoom(body.roomId)
+
+    if (room.totalCount != "0") {
+      const roomUpdate = this.roomRepository.GetRoom(body.roomId)
+      this.eventEmitter.emit('room.updated', roomUpdate);
+    }
   }
 
   async JoinRoom(body: RoomUserType) {

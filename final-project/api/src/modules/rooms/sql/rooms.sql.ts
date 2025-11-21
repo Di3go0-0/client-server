@@ -55,4 +55,11 @@ export enum RoomsSql {
     WHERE ur.room_id = ?
     AND ur.active = 1
 `,
+
+  ExistRoom = `
+    SELECT
+      count(*) AS "totalCount"
+    FROM rooms r
+    where r.id = ?
+`,
 }

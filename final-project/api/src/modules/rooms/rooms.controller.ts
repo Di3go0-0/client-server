@@ -32,18 +32,18 @@ export class RoomsController {
     return await this.roomsService.createRoom({ ...body, owner_id: req.user.id });
   }
 
-  @Post('join')
-  async JoinRoom(@Request() req: any, @Query() body: RoomIdDto) {
-    return await this.roomsService.JoinRoom({ ...body, userId: req.user.id });
-  }
+  // @Post('join')
+  // async JoinRoom(@Request() req: any, @Query() body: RoomIdDto) {
+  //   return await this.roomsService.JoinRoom({ ...body, userId: req.user.id });
+  // }
 
   @Put()
   async updateRoom(@Request() req: any, @Body() body: UpdateRoomDto) {
     return await this.roomsService.udpateRoom({ ...body, userId: req.user.id })
   }
 
-  @Delete('exit')
-  async ExitRoom(@Request() req: any, @Query() body: RoomIdDto) {
-    return await this.roomsService.exitRoom({ ...body, userId: req.user.id });
-  }
+  // @Delete('exit')
+  // async ExitRoom(@Request() req: any, @Query() body: RoomIdDto) {
+  //   return await this.roomsService.exitRoom({ ...body, userId: req.user.id });
+  // }
 }

@@ -51,7 +51,6 @@ export class GlobalGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (!this.usersService.getUserById(user.id))
         this.usersService.addUser(client.id, user); // Add clientId to user before passing
       this.logger.log(`Client connected `);
-      console.log(this.usersService.getAllUsers())
       this.eventEmitter.emit('user.toogle.connection', user.id);
       this.eventEmitter.emit('update.users.actives');
     } catch (error) {

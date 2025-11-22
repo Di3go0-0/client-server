@@ -34,7 +34,7 @@ export class RoomsGateway {
       const users = await this.getFormattedUsersInRoom(room.id);
 
       const usersActivesInRoom = `users.room.updated.room_${room.id}`;
-            this.server.to(usersActivesInRoom).emit(`users.room.updated.room_${room.id}`, users);
+      this.server.to(usersActivesInRoom).emit(`users.room.updated.room_${room.id}`, users);
     }
   }
 
@@ -48,6 +48,7 @@ export class RoomsGateway {
   @SubscribeMessage('get_rooms')
   async handleGetRooms() {
     const rooms = await this.roomsService.GetAllRooms();
+    console.log("keloke mando", rooms);
     this.server.emit('rooms_list', rooms);
     return rooms;
   }
@@ -81,7 +82,7 @@ export class RoomsGateway {
     const users = await this.getFormattedUsersInRoom(roomId);
 
     // Notificar a todos los suscriptores de la sala
-        this.server.to(usersActivesInRoom).emit(`users.room.updated.room_${roomId}`, users);
+    this.server.to(usersActivesInRoom).emit(`users.room.updated.room_${roomId}`, users);
   }
 
   // Usuario sale de una room

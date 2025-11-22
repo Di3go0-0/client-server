@@ -68,11 +68,11 @@ export class GlobalGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.usersService.removeUser(client.id);
     if (!user) return
     this.logger.log(`Client connected `);
-    console.log(this.usersService.getAllUsers())
+    // console.log(this.usersService.getAllUsers())
     this.eventEmitter.emit('user.toogle.connection', user.id);
     this.eventEmitter.emit('update.users.actives');
 
-    console.log("------------------------------------------------------------")
+    // console.log("------------------------------------------------------------")
     console.log("------------------------------------------------------------")
     console.log("Conexion perdida")
   }

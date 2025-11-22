@@ -26,8 +26,8 @@ export class MysqlService {
   async query<T = any>(sql: string, params: any[] = []): Promise<T[]> {
     try {
       const [rows] = await this.pool.query<RowDataPacket[]>(sql, params);
-      this.logger.log(sql, params)
-      this.logger.debug(rows);
+      // this.logger.log(sql, params)
+      // this.logger.debug(rows);
       return rows as T[];
     } catch (error) {
       this.logger.error(`MySQL query error: ${error.message}`);
@@ -40,7 +40,7 @@ export class MysqlService {
   async execute<T = any>(sql: string, params: any[] = []): Promise<T & { insertId?: number }> {
     try {
       const [result] = await this.pool.execute<ResultSetHeader>(sql, params);
-      this.logger.log(result);
+      // this.logger.log(result);
       // convertimos primero a unknown, luego a T & { insertId?: number }
       return result as unknown as T & { insertId?: number };
     } catch (error) {

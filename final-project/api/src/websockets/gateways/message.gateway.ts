@@ -40,7 +40,7 @@ export class MessageGateway {
     if (!user) return;
 
     const message = await this.messagesService.sendMessasge({ ...body, userId: user.id })
-    console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", this.usersConnected.getAllUsers())
+    // console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", this.usersConnected.getAllUsers())
 
     this.server.to(roomMessages).emit('messages.suscription', message);
   }

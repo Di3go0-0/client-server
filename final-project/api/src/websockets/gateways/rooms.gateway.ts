@@ -33,8 +33,8 @@ export class RoomsGateway {
     for (const room of roomsByUser) {
       const users = await this.getFormattedUsersInRoom(room.id);
 
-      const usersActivesInRoom = `users_active_room_id_${room.id}`;
-      this.server.to(usersActivesInRoom).emit('users.room.updated', users);
+      const usersActivesInRoom = `users.room.updated.room_${room.id}`;
+            this.server.to(usersActivesInRoom).emit(`users.room.updated.room_${room.id}`, users);
     }
   }
 
@@ -75,13 +75,13 @@ export class RoomsGateway {
 
     await this.roomsService.JoinRoom({ userId: user.id, roomId })
 
-    const usersActivesInRoom = `users_active_room_id_${roomId}`;
+    const usersActivesInRoom = `users.room.updated.room_${roomId}`;
     client.join(usersActivesInRoom);
 
     const users = await this.getFormattedUsersInRoom(roomId);
 
     // Notificar a todos los suscriptores de la sala
-    this.server.to(usersActivesInRoom).emit('users.room.updated', users);
+        this.server.to(usersActivesInRoom).emit(`users.room.updated.room_${roomId}`, users);
   }
 
   // Usuario sale de una room
@@ -95,12 +95,12 @@ export class RoomsGateway {
 
     await this.roomsService.exitRoom({ userId: user.id, roomId })
 
-    const usersActivesInRoom = `users_active_room_id_${roomId}`;
+    const usersActivesInRoom = `users.room.updated.room_${roomId}`;
     client.leave(usersActivesInRoom);
 
     const users = await this.getFormattedUsersInRoom(roomId);
 
-    this.server.to(usersActivesInRoom).emit('users.room.updated', users);
+    this.server.to(usersActivesInRoom).emit(`users.room.updated.room_${roomId}`, users);
   }
 
   // Suscribirse a los usuario conectados en una sala especifica
@@ -109,13 +109,13 @@ export class RoomsGateway {
     @MessageBody() id: number,
     @ConnectedSocket() client: Socket
   ) {
-    const usersActivesInRoom = `users_active_room_id_${id}`;
+    const usersActivesInRoom = `users.room.updated.room_${id}`;
     client.join(usersActivesInRoom);
 
 
     const users = await this.getFormattedUsersInRoom(id);
 
-    this.server.to(client.id).emit('users.room.updated', users);
+    this.server.to(client.id).emit(`users.room.updated.room_${id}`, users);
   }
 
   // Notificar a los clientes suscritos de los usuarios activos en una sala
@@ -123,12 +123,12 @@ export class RoomsGateway {
   async handleCreated(
     @MessageBody() id: number
   ) {
-    const roomIdUsers = `users_active_room_id_${id}`;
+    const roomIdUsers = `users.room.updated.room_${id}`;
 
     const users = await this.getFormattedUsersInRoom(id);
 
     // Mandas la nueva lista a TODOS los subscriptores
-    this.server.to(roomIdUsers).emit('users.room.updated', users);
+    this.server.to(roomIdUsers).emit(`users.room.updated.room_${id}`, users);
   }
 }
 

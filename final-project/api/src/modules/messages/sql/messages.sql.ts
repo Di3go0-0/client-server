@@ -23,6 +23,6 @@ export enum MessagesSql {
       m.sent_at
     FROM messages m
     WHERE m.active = 1
-    AND m.room_id = 1
+    AND m.room_id = ?
     LIMIT 30`,
 }

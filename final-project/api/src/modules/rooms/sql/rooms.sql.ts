@@ -40,6 +40,7 @@ export enum RoomsSql {
     vw.room_id as id,
     vw.name,
     vw.description,
+    vw.owner_id,
     vw.active_users
   FROM vw_active_rooms vw;
   `,

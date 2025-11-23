@@ -11,5 +11,6 @@ export type RoomsActivesEntity = {
   name: string;
   description: string;
   active_users: string;
+  owner_id: number;
 }
 

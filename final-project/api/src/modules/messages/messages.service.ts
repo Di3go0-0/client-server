@@ -8,7 +8,7 @@ export class MessagesService {
   constructor(private readonly messagesDbService: MessagesRepository) { }
 
   async sendMessasge(body: SendMessageType): Promise<MessageEntity> {
-    console.log(body)
+    // console.log(body)
     return await this.messagesDbService.sendMessasge(body)
   }
 

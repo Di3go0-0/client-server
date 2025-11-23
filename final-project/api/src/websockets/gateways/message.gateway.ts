@@ -24,6 +24,7 @@ export class MessageGateway {
   ) {
     const roomMessages = `m_room_id_${id}`;
     client.join(roomMessages);
+    console.log('aquiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii')
     const messages = await this.messagesService.getMesagesByRoom(id);
 
     this.server.to(client.id).emit('messages.suscription', messages);

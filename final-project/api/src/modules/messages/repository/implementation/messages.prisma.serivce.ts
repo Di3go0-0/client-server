@@ -41,6 +41,7 @@ export class MessagesDbService implements MessagesRepository {
         MessagesSql.GetMessageByRoom,
         [roomId]
       )
+      console.log(message, roomId)
 
       return message
     } catch (err) {

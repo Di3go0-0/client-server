@@ -26,8 +26,8 @@ export class MysqlService {
   async query<T = any>(sql: string, params: any[] = []): Promise<T[]> {
     try {
       const [rows] = await this.pool.query<RowDataPacket[]>(sql, params);
-      // this.logger.log(sql, params)
-      // this.logger.debug(rows);
+      this.logger.log(sql, params)
+      this.logger.debug(rows);
       return rows as T[];
     } catch (error) {
       this.logger.error(`MySQL query error: ${error.message}`);

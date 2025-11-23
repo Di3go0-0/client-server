@@ -30,8 +30,12 @@ async function bootstrap() {
   )
   console.log(`Swagger running on: localhost:${port}/${swaggerRute}`);
 
-  app.enableCors();
+  app.enableCors({
+    origin: '*', // Permite el acceso de cualquier origen
+    methods: '*', // Permite todos los métodos HTTP
+    allowedHeaders: '*', // Permite todos los encabezados
+  });
 
-  await app.listen(port, '0.0.0.0');
+  await app.listen(port);
 }
 bootstrap();

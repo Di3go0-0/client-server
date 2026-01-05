@@ -18,26 +18,23 @@ import {
 import SendIcon from "@mui/icons-material/Send";
 import AddIcon from "@mui/icons-material/Add";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { Room, type IRoomMap } from "../../domain/models/Room";
-import { RoomsController } from "./Rooms.controller";
-import { useWS } from "../../context/WSContext";
-import { Message, type IMessageMap } from "../../domain/models/Message";
+import { Room, Message, RoomUser } from "../../types/api.types";
+import { RoomService } from "../../services/roomService";
+import { useWebSocket } from "../../context/WSContext";
+import { useAuth } from "../../context/AuthContext";
+import { WS_EVENTS } from "../../config/constants";
 import SimpleFormDialog from "./RoomForm";
-import type { RoomUser } from "./Rooms.types";
-import { User } from "../../domain/models/User";
 import UpdateRoomDialog from "./RoomUpdateForm";
 import { ThemeToggle } from "../components/ThemeToogle";
 import { UserAvatar } from "../components/userAvatar";
 
 export default function ChatApp() {
-  const controller = new RoomsController();
+  const roomService = new RoomService();
   const muiTheme = useTheme();
-  const activeUser: User = new User(
-    JSON.parse(localStorage.getItem("profile")!),
-  );
+  const { user } = useAuth();
   const [open, setOpen] = useState<boolean>(false);
   const [editOpen, setEditOpen] = useState<boolean>(false);
-  const { ws, isConnected } = useWS();
+  const { socket, isConnected, emit, on, off } = useWebSocket();
 
   const [selectedRoom, setSelectedRoom] = useState<number>(1);
   const [input, setInput] = useState("");
@@ -47,63 +44,58 @@ export default function ChatApp() {
   const [subscribedRooms, setSubscribedRooms] = useState<Room[]>([]);
 
   const joinRoom = async () => {
-    ws.emit("join_room", selectedRoom);
-    ws.emit("messages.suscribe", { id: selectedRoom });
-    ws.on(`users.room.updated.room_${selectedRoom}`, (users) =>
-      getUsersFromRoom(selectedRoom, users),
-    );
-
-    const newRoom = rooms.find((r) => r.id == selectedRoom);
-    if (newRoom == undefined) return;
-    setSubscribedRooms((prev) => [...prev, newRoom]);
+    try {
+      emit(WS_EVENTS.JOIN_ROOM, selectedRoom);
+      emit(WS_EVENTS.MESSAGE_SUBSCRIBE, { id: selectedRoom });
+      emit(WS_EVENTS.USERS_ROOM_SUBSCRIBE, selectedRoom);
+      
+      const newRoom = rooms.find((r) => r.id === selectedRoom);
+      if (!newRoom) return;
+      setSubscribedRooms((prev) => [...prev, newRoom]);
+    } catch (error) {
+      console.error('Error joining room:', error);
+    }
   };
 
   const exitRoom = async () => {
-    ws.emit("left_room", selectedRoom);
-    window.location.reload();
+    try {
+      emit(WS_EVENTS.LEAVE_ROOM, selectedRoom);
+      await roomService.exitRoom(selectedRoom);
+      setSubscribedRooms(prev => prev.filter(r => r.id !== selectedRoom));
+    } catch (error) {
+      console.error('Error leaving room:', error);
+    }
   };
 
   const handleCreateRoom = async (name: string, description: string) => {
-    await controller.createRoom(name, description);
-    window.location.reload();
+    try {
+      await roomService.createRoom({ name, description });
+      emit(WS_EVENTS.GET_ROOMS);
+    } catch (error) {
+      console.error('Error creating room:', error);
+    }
   };
 
   const handleUpdateRoom = async (name: string, description: string) => {
-    const toBeUpdatedRoom = rooms.find((r) => r.id == selectedRoom);
-    if (toBeUpdatedRoom == undefined) return;
-    await controller.updateRoom(name, description, toBeUpdatedRoom);
+    try {
+      const toBeUpdatedRoom = rooms.find((r) => r.id === selectedRoom);
+      if (!toBeUpdatedRoom) return;
+      await roomService.updateRoom({ 
+        roomId: toBeUpdatedRoom.id, 
+        name, 
+        description 
+      });
+    } catch (error) {
+      console.error('Error updating room:', error);
+    }
   };
 
-  const getInitialRooms = (data: IRoomMap[]) => {
-    const newRooms = data.map((r) => Room.fromMap(r));
-    setRooms(newRooms);
-  };
-
-  const getNewRoom = (room: IRoomMap) => {
-    setRooms((prev) => [...prev, Room.fromMap(room)]);
-  };
-
-  const updateRoom = (room: IRoomMap) => {
-    const updatedRoom = Room.fromMap(room);
-    setRooms((prev) => {
-      const newArr = [...prev];
-      const toBeUpdatedRoom = prev.find((r) => r.id == updatedRoom.id);
-      if (toBeUpdatedRoom == undefined) return prev;
-      const toBeUpdatedRoomIndex = prev.indexOf(toBeUpdatedRoom);
-      if (toBeUpdatedRoomIndex < 0) return prev;
-      newArr[toBeUpdatedRoomIndex] = updatedRoom;
-      return newArr;
-    });
-  };
-
-  const getUsersFromRoom = async (roomId: number, data: any[]) => {
+  const getUsersFromRoom = (roomId: number, data: any[]) => {
     const roomUsers: RoomUser[] = data.map((u) => ({
-      active: u["online"],
-      user: new User({
-        id: u["id"],
-        username: u["userName"],
-        email: u["email"],
-      }),
+      id: u.id,
+      username: u.userName,
+      email: u.email,
+      online: u.online,
     }));
     setUsers((prev) => ({
       ...prev,
@@ -111,67 +103,88 @@ export default function ChatApp() {
     }));
   };
 
-  const getNewMessage = (message: IMessageMap | IMessageMap[]) => {
+  const getNewMessage = (message: Message | Message[]) => {
     if (Array.isArray(message)) {
-      const newMessages = message.map((m) => Message.fromMap(m));
-      if (newMessages.length === 0) return;
+      if (message.length === 0) return;
       setMessages((prev) => ({
         ...prev,
-        [newMessages[0].roomId]: [
-          ...(prev[newMessages[0].roomId] ?? []),
-          ...newMessages,
+        [message[0].roomId]: [
+          ...(prev[message[0].roomId] ?? []),
+          ...message,
         ],
       }));
     } else {
-      const newMessage = Message.fromMap(message);
       setMessages((prev) => ({
         ...prev,
-        [newMessage.roomId]: [...(prev[newMessage.roomId] ?? []), newMessage],
+        [message.roomId]: [...(prev[message.roomId] ?? []), message],
       }));
     }
   };
 
-  const getUserInfo = (userId: number) => {
-    const user = currentUsers.find((u) => u.user.id === userId);
-    return user?.user;
+  const getUserInfo = (userId: number): RoomUser | undefined => {
+    return currentUsers.find((u) => u.id === userId);
   };
 
   useEffect(() => {
     const init = async () => {
       if (!isConnected) return;
-      const subscribedRooms = await controller.getRoomsByUser();
-      setSubscribedRooms(subscribedRooms);
-      ws.emit("get_rooms");
+      
+      const userRooms = await roomService.getUserRooms();
+      setSubscribedRooms(userRooms);
+      emit(WS_EVENTS.GET_ROOMS);
 
-      subscribedRooms.forEach((r) => {
-        ws.emit("users.room.subscribe", r.id);
-        ws.emit("messages.suscribe", { id: r.id });
-        ws.on(`users.room.updated.room_${r.id}`, (users) =>
+      userRooms.forEach((r) => {
+        emit(WS_EVENTS.USERS_ROOM_SUBSCRIBE, r.id);
+        emit(WS_EVENTS.MESSAGE_SUBSCRIBE, { id: r.id });
+        on(WS_EVENTS.USERS_ROOM_UPDATED(r.id), (users) =>
           getUsersFromRoom(r.id, users),
         );
       });
-      ws.on("rooms_list", getInitialRooms);
-      ws.on("room_created", getNewRoom);
-      ws.on("room_updated", updateRoom);
-      ws.on("messages.suscription", getNewMessage);
+      
+      on(WS_EVENTS.ROOMS_LIST, getInitialRooms);
+      on(WS_EVENTS.ROOM_CREATED, getNewRoom);
+      on(WS_EVENTS.ROOM_UPDATED, updateRoom);
+      on(WS_EVENTS.MESSAGE_SUBSCRIPTION, getNewMessage);
     };
+    
     init();
 
     return () => {
-      ws.socket?.off("rooms_list", getInitialRooms);
-      ws.socket?.off("room_created");
-      ws.socket?.off("messages.suscription");
+      off(WS_EVENTS.ROOMS_LIST);
+      off(WS_EVENTS.ROOM_CREATED);
+      off(WS_EVENTS.ROOM_UPDATED);
+      off(WS_EVENTS.MESSAGE_SUBSCRIPTION);
     };
-  }, [isConnected]);
+  }, [isConnected, on, off, emit]);
 
   const handleSendMessage = () => {
     if (input.trim()) {
-      ws.emit("users-send.message", {
+      emit(WS_EVENTS.MESSAGE_SEND, {
         roomId: selectedRoom,
         message: input,
       });
       setInput("");
     }
+  };
+
+  const getInitialRooms = (data: Room[]) => {
+    setRooms(data);
+  };
+
+  const getNewRoom = (room: Room) => {
+    setRooms((prev) => [...prev, room]);
+  };
+
+  const updateRoom = (room: Room) => {
+    setRooms((prev) => {
+      const newArr = [...prev];
+      const toBeUpdatedRoom = prev.find((r) => r.id === room.id);
+      if (!toBeUpdatedRoom) return prev;
+      const toBeUpdatedRoomIndex = prev.indexOf(toBeUpdatedRoom);
+      if (toBeUpdatedRoomIndex < 0) return prev;
+      newArr[toBeUpdatedRoomIndex] = room;
+      return newArr;
+    });
   };
 
   const currentRoom = rooms.find((r) => r.id === selectedRoom);
@@ -338,8 +351,8 @@ export default function ChatApp() {
           </Typography>
 
           <Box display="flex" gap={1}>
-            {rooms.find((r) => r.id == selectedRoom)?.ownerId ===
-              activeUser.id && (
+            {rooms.find((r) => r.id === selectedRoom)?.ownerId ===
+              user?.id && (
               <Button
                 onClick={() => setEditOpen(true)}
                 variant="outlined"
@@ -432,7 +445,10 @@ export default function ChatApp() {
                           variant="caption"
                           sx={{ color: "text.secondary" }}
                         >
-                          12:34 PM
+                          {msg.timestamp 
+                            ? new Date(msg.timestamp).toLocaleTimeString()
+                            : ''
+                          }
                         </Typography>
                       </Box>
                       <Typography
@@ -554,50 +570,50 @@ export default function ChatApp() {
 
         <List sx={{ p: 0 }}>
           {currentUsers.map((user) => (
-            <ListItem
-              key={user.user.id}
-              sx={{
-                px: 2,
-                py: 1.5,
-                borderLeft: "3px solid",
-                borderColor: user.active ? "success.main" : "transparent",
-                bgcolor: "transparent",
-                transition: "all 0.2s ease",
-                "&:hover": {
-                  bgcolor: "action.hover",
-                },
-              }}
-            >
-              <ListItemAvatar>
-                <Avatar
-                  sx={{
-                    width: 36,
-                    height: 36,
-                    bgcolor: user.active ? "success.main" : "action.disabled",
-                    fontWeight: 600,
-                    fontSize: "0.9rem",
-                  }}
-                >
-                  {user.user.username[0].toUpperCase()}
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText
-                primary={user.user.username}
-                primaryTypographyProps={{
-                  variant: "body2",
-                  sx: {
-                    fontWeight: 500,
-                  },
-                }}
-                secondary={user.active ? "En línea" : "Desconectado"}
-                secondaryTypographyProps={{
-                  variant: "caption",
-                  sx: {
-                    color: user.active ? "success.main" : "text.secondary",
-                  },
-                }}
-              />
-            </ListItem>
+               <ListItem
+                 key={user.id}
+                 sx={{
+                   px: 2,
+                   py: 1.5,
+                   borderLeft: "3px solid",
+                   borderColor: user.online ? "success.main" : "transparent",
+                   bgcolor: "transparent",
+                   transition: "all 0.2s ease",
+                   "&:hover": {
+                     bgcolor: "action.hover",
+                   },
+                 }}
+               >
+                 <ListItemAvatar>
+                   <Avatar
+                     sx={{
+                       width: 36,
+                       height: 36,
+                       bgcolor: user.online ? "success.main" : "action.disabled",
+                       fontWeight: 600,
+                       fontSize: "0.9rem",
+                     }}
+                   >
+                     {user.username[0].toUpperCase()}
+                   </Avatar>
+                 </ListItemAvatar>
+                 <ListItemText
+                   primary={user.username}
+                   primaryTypographyProps={{
+                     variant: "body2",
+                     sx: {
+                       fontWeight: 500,
+                     },
+                   }}
+                   secondary={user.online ? "En línea" : "Desconectado"}
+                   secondaryTypographyProps={{
+                     variant: "caption",
+                     sx: {
+                       color: user.online ? "success.main" : "text.secondary",
+                     },
+                   }}
+                 />
+               </ListItem>
           ))}
         </List>
       </Drawer>

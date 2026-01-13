@@ -1,10 +1,10 @@
-import React from 'react';
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { RequireAuth } from './guards/RequiredAuth';
 import { RequireUnauth } from './guards/RequiredUnauth';
 import { Login } from './views/Login';
 import { Register } from './views/Register';
-import { ChatApp } from './views/rooms/Rooms';
+import ChatApp from './views/rooms/Rooms';
 import { AuthProvider } from './context/AuthContext';
 import { WebSocketProvider } from './context/WSContext';
 import { ThemeProvider } from './context/ThemeProvider';

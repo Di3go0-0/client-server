@@ -1,4 +1,4 @@
-# Chat API
+# Chat Hub API
 
 A real-time chat application API built with NestJS, featuring WebSocket support for instant messaging, room management, and user authentication.
 
@@ -128,8 +128,8 @@ The API uses a single, optimized WebSocket gateway (`ChatGateway`) that handles:
 
 1. **Clone repository**
    ```bash
-   git clone <repository-url>
-   cd final-project/api
+   git clone https://github.com/Di3go0-0/chat-hub
+   cd chat-hub/api
    ```
 
 2. **Install dependencies**

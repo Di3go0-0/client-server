@@ -1,5 +1,5 @@
 import { ApiClient } from '../services/apiClient';
-import { Room, CreateRoomRequest, UpdateRoomRequest } from '../types/api.types';
+import type { Room, CreateRoomRequest, UpdateRoomRequest } from '../types/api.types';
 
 export class RoomService {
   private apiClient: ApiClient;

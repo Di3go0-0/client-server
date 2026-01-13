@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { API_CONFIG, WS_EVENTS, STORAGE_KEYS } from '../config/constants';
+import { API_CONFIG, STORAGE_KEYS } from '../config/constants';
 
 interface WebSocketContextType {
   socket: Socket | null;

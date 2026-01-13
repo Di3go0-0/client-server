@@ -36,7 +36,9 @@ export function useSocket(
       onConnectionChange(false);  // <--- AVISAMOS AL PROVIDER
     });
 
-    return () => socket.disconnect();
+    return () => {
+      socket.disconnect();
+    };
   }, [url, onConnectionChange]);
 
   const on = useCallback((event: string, handler: (data: any) => void) => {

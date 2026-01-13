@@ -1,4 +1,5 @@
-import axios, { AxiosInstance, AxiosError } from 'axios';
+import axios from 'axios';
+import type { AxiosInstance, AxiosError } from 'axios';
 import { API_CONFIG, STORAGE_KEYS } from '../config/constants';
 
 export class ApiClient {

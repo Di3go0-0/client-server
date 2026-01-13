@@ -1,4 +1,4 @@
-# Chat Application - Frontend
+# Chat Hub - Frontend
 
 A modern, real-time chat application frontend built with React, TypeScript, and Material-UI. This application provides an intuitive interface for users to communicate in real-time through WebSocket connections.
 
@@ -73,8 +73,8 @@ src/
 
 1. **Clone repository**
    ```bash
-   git clone <repository-url>
-   cd final-project/app
+   git clone https://github.com/Di3go0-0/chat-hub
+   cd chat-hub/app
    ```
 
 2. **Install dependencies**

@@ -1,0 +1,83 @@
+
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: chat-hub-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: chat_db
+      MYSQL_USER: chatuser
+      MYSQL_PASSWORD: chatpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./api/sql/script.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - chat-hub-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Backend API (NestJS)
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: chat-hub-api
+    restart: unless-stopped
+    environment:
+      API_PORT: 3000
+      SWAGGER_RUTE: /api
+      SECRET_KEY: your-super-secret-jwt-key-change-in-production
+      RESEND_API_KEY: your-email-service-key
+      DATABASE_URL: mysql://chatuser:chatpassword@mysql:3306/chat_db
+    ports:
+      - "3000:3000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - chat-hub-network
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -s -f http://localhost:3000/api > /dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend App (React)
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: chat-hub-app
+    restart: unless-stopped
+    environment:
+      VITE_API_URI: http://localhost:3000
+      VITE_WS_URI: http://localhost:3000
+    ports:
+      - "80:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - chat-hub-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  chat-hub-network:
+    driver: bridge

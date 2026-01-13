@@ -13,7 +13,7 @@ import {
 import { useState } from "react";
 import { LoginController } from "./Login.controller";
 import { useNavigate } from "react-router-dom";
-import { useTheme } from "../context/ThemeProvider";
+
 import { ThemeToggle } from "./components/ThemeToogle";
 
 interface LoginErrors {
@@ -25,7 +25,7 @@ interface LoginErrors {
 export const Login = () => {
   const navigate = useNavigate();
   const controller = new LoginController();
-  const muiTheme = useTheme();
+
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");

@@ -1,6 +1,6 @@
-# Real-Time Chat Application
+# Chat Hub
 
-A modern, full-stack chat application built with React, TypeScript, and NestJS. This project demonstrates real-time communication through WebSocket connections, user authentication, and room-based messaging with a clean, professional architecture.
+A modern, full-stack real-time chat application built with React, TypeScript, and NestJS. This project demonstrates real-time communication through WebSocket connections, user authentication, and room-based messaging with a clean, professional architecture.
 
 ## 🚀 Project Overview
 
@@ -18,7 +18,7 @@ Experience the application with both frontend and backend working together to pr
 ## 🏗️ Architecture Overview
 
 ```
-final-project/
+chat-hub/
 ├── api/                    # Backend API (NestJS)
 │   ├── src/
 │   │   ├── core/           # Core infrastructure
@@ -96,8 +96,8 @@ final-project/
 
 ### 1. Clone Repository
 ```bash
-git clone <repository-url>
-cd final-project
+git clone https://github.com/Di3go0-0/chat-hub
+cd chat-hub
 ```
 
 ### 2. Backend Setup
@@ -394,8 +394,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ```bash
 # Clone and setup
-git clone <repository-url>
-cd final-project
+git clone https://github.com/Di3go0-0/chat-hub
+cd chat-hub
 
 # Start both services (with Docker)
 docker-compose up -d

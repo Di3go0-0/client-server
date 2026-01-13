@@ -13,12 +13,12 @@ import {
   Typography,
   ListItemAvatar,
   Button,
-  useTheme,
+
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import AddIcon from "@mui/icons-material/Add";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { Room, Message, RoomUser } from "../../types/api.types";
+import type { Room, Message, RoomUser } from "../../types/api.types";
 import { RoomService } from "../../services/roomService";
 import { useWebSocket } from "../../context/WSContext";
 import { useAuth } from "../../context/AuthContext";
@@ -30,11 +30,11 @@ import { UserAvatar } from "../components/userAvatar";
 
 export default function ChatApp() {
   const roomService = new RoomService();
-  const muiTheme = useTheme();
+
   const { user } = useAuth();
   const [open, setOpen] = useState<boolean>(false);
   const [editOpen, setEditOpen] = useState<boolean>(false);
-  const { socket, isConnected, emit, on, off } = useWebSocket();
+  const { isConnected, emit, on, off } = useWebSocket();
 
   const [selectedRoom, setSelectedRoom] = useState<number>(1);
   const [input, setInput] = useState("");

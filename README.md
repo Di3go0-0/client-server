@@ -22,10 +22,15 @@ client-server/
 │   ├── point-7/               # Process Management (C#)
 │   ├── point-8/               # [Additional Exercise]
 │   └── point-9/               # [Additional Exercise]
-├── 📂 final-project/           # Real-Time Chat Application
-│   ├── api/                   # NestJS Backend API
-│   └── app/                   # React Frontend Application
+├── 📂 final-project/ 📦        # Real-Time Chat Application (Git Submodule)
+│   └── [External Repository]  # 📎 chat-hub → Full-stack chat application
 ├── 📂 app/                     # Supporting Application Files
+│   ├── auth.js                 # Authentication testing
+│   ├── messages1.js & messages2.js  # Message testing clients
+│   ├── room.js                 # Room management testing
+│   ├── users.js                # User management testing
+│   └── room-toggle.js         # Room operations testing
+├── 📄 .gitmodules              # Git submodule configuration
 └── 📄 README.md               # This file
 ```
 
@@ -51,8 +56,10 @@ client-server/
 - **Point 6**: Game development with random number generation (C#)
 - **Point 7**: System process management and control (C#)
 
-### 🌐 Final Project: Real-Time Chat Application
+### 🌐 Final Project: Real-Time Chat Application 📦
 **Focus**: Full-stack web development with real-time communication capabilities.
+
+> **Note**: This is implemented as a **Git Submodule** pointing to the dedicated `chat-hub` repository.
 
 A complete chat application featuring:
 - **Backend**: NestJS with WebSocket support for real-time messaging
@@ -60,6 +67,8 @@ A complete chat application featuring:
 - **Database**: MySQL with Prisma ORM for data persistence
 - **Authentication**: JWT-based secure user authentication
 - **Real-time Features**: Instant messaging, room management, online status
+
+**📌 Repository**: [chat-hub](https://github.com/Di3go0-0/chat-hub) (External Submodule)
 
 ## 🛠️ Technology Stack
 
@@ -101,7 +110,38 @@ Through this repository, I've developed expertise in:
 |---------|---------------|--------|--------------|
 | Workshop 1 | C#/.NET | ✅ Complete | SOLID principles, Design patterns |
 | Workshop 2 | C#/Python | ✅ Complete | Multi-language programming |
-| Final Project | Node.js/React | ✅ Complete | Real-time chat, Full-stack |
+| Final Project 📦 | Node.js/React | ✅ Complete | Real-time chat, Full-stack (Submodule) |
+
+## 📦 Git Submodule Management
+
+The final project is managed as a Git submodule to maintain separation between the course work and the dedicated project repository.
+
+### Submodule Commands
+
+```bash
+# Initialize submodule (first time setup)
+git submodule update --init --recursive
+
+# Update submodule to latest changes
+git submodule update --remote final-project
+
+# Navigate into submodule directory
+cd final-project
+
+# Work within submodule (it's a separate repository)
+git status
+git pull origin main
+
+# Return to main repository
+cd ..
+```
+
+### Why Use Submodules?
+
+- **Separation of Concerns**: Keeps the final project's own development history separate
+- **Independent Development**: Allows the chat application to evolve independently
+- **Clean Repository**: Maintains a clean structure for the course materials
+- **Version Control**: Each repository maintains its own commit history and releases
 
 ## 🚀 Getting Started
 
@@ -122,11 +162,17 @@ Through this repository, I've developed expertise in:
 2. **Explore workshops**
    - Check [Workshop 1](./workshop-1/) for C# and design patterns
    - Check [Workshop 2](./workshop-2/) for multi-language exercises
-   - Check [Final Project](./final-project/) for full-stack application
+   - Check [Final Project](./final-project/) for full-stack application (submodule)
 
-3. **Run the final project**
+3. **Initialize and run the final project (submodule)**
    ```bash
+   # Initialize submodule (first time only)
+   git submodule update --init --recursive
+   
+   # Navigate to submodule
    cd final-project
+   
+   # Run the application
    docker-compose up -d
    ```
 
@@ -134,8 +180,9 @@ Through this repository, I've developed expertise in:
 
 - [Workshop 1 Documentation](./workshop-1/) - C# design patterns and SOLID principles
 - [Workshop 2 Documentation](./workshop-2/) - Multi-language programming exercises
-- [Final Project Documentation](./final-project/) - Real-time chat application details
-- [Supporting App Files](./app/) - Additional application resources
+- [Final Project Documentation](./final-project/) 📦 - Real-time chat application (submodule)
+- [External Project Repository](https://github.com/Di3go0-0/chat-hub) - Dedicated chat-hub repository
+- [Supporting App Files](./app/) - WebSocket testing and debugging tools
 
 ## 💡 Key Takeaways
 
